@@ -92,7 +92,7 @@ final class ConvolutionNTTPrime extends Convolution {
             a[i] = MA.mul(a[i], b[i]);
         }
         butterflyInv(a);
-        a = java.util.Arrays.copyOf(a, n + m - 1);
+        a = Arrays.copyOf(a, n + m - 1);
 
         long iz = MA.pow(z, MOD - 2);
         for (int i = 0; i < n + m - 1; i++) a[i] = MA.mul(a[i], iz);
@@ -299,7 +299,7 @@ final class ModPolynomialFactory {
         while (degF > 0 && f[degF] == 0) {
             degF--;
         }
-        return java.util.Arrays.copyOf(f, degF + 1);
+        return Arrays.copyOf(f, degF + 1);
     }
 
     private long[] _cut(long[] f, int deg) {
@@ -307,13 +307,13 @@ final class ModPolynomialFactory {
         while (deg > 0 && f[deg] == 0) {
             deg--;
         }
-        return java.util.Arrays.copyOf(f, deg + 1);
+        return Arrays.copyOf(f, deg + 1);
     }
 
     private long[] _add(long[] f, long[] g) {
         final int degF = f.length - 1, degG = g.length - 1;
         int deg = Math.max(degF, degG);
-        long[] res = java.util.Arrays.copyOf(f, deg + 1);
+        long[] res = Arrays.copyOf(f, deg + 1);
         for (int i = 0; i <= degG; i++) {
             res[i] = ma.add(res[i], g[i]);
         }
@@ -323,7 +323,7 @@ final class ModPolynomialFactory {
     private long[] _sub(long[] f, long[] g) {
         final int degF = f.length - 1, degG = g.length - 1;
         int deg = Math.max(degF, degG);
-        long[] res = java.util.Arrays.copyOf(f, deg + 1);
+        long[] res = Arrays.copyOf(f, deg + 1);
         for (int i = 0; i <= degG; i++) {
             res[i] = ma.sub(res[i], g[i]);
         }
@@ -414,7 +414,7 @@ final class ModPolynomialFactory {
         if (tlz * k >= f.length) {
             return new long[]{0};
         }
-        long[] g = java.util.Arrays.copyOfRange(f, tlz, f.length);
+        long[] g = Arrays.copyOfRange(f, tlz, f.length);
         long base = g[0];
         g = _muli(g, ma.inv(base));
         long[] h = _muli(_exp(_muli(_log(g, deg), k), deg), ma.pow(base, k));
@@ -437,7 +437,7 @@ final class ModPolynomialFactory {
             return java.util.Optional.empty();
         }
         long sq = ops.getAsLong();
-        long[] g = java.util.Arrays.copyOfRange(f, tlz, f.length);
+        long[] g = Arrays.copyOfRange(f, tlz, f.length);
         g = _muli(_exp(_muli(_log(_muli(g, ma.inv(g[0])), deg), ma.inv(2)), deg), sq);
         long[] sqrt = new long[tlz / 2 + g.length];
         System.arraycopy(g, 0, sqrt, tlz / 2, g.length);
@@ -558,7 +558,7 @@ final class ModPolynomialFactory {
             return ret;
         }
         public ModPolynomial expand(int deg) {
-            return new ModPolynomial(java.util.Arrays.copyOf(C, deg + 1));
+            return new ModPolynomial(Arrays.copyOf(C, deg + 1));
         }
         public ModPolynomial cut(int deg) {
             return new ModPolynomial(_cut(C, deg));
