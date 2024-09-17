@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.BitSet;
 
 public class LocalErrorCorrecter {
@@ -7,7 +8,7 @@ public class LocalErrorCorrecter {
     * https://en.wikipedia.org/wiki/Hamming_code
     * */
 
-    public static final int ECC_BIT = 11;
+    public static final int ECC_BIT = 14;
     public static final int DECODE_SIZE = (1 << (ECC_BIT - 1));
     public static final int ENCODE_SIZE = DECODE_SIZE - ECC_BIT;
 
