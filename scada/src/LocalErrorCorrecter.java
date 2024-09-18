@@ -6,6 +6,7 @@ public class LocalErrorCorrecter {
     /*
     * using extended Hamming code to detect and correct 1-bit error in packet
     * https://en.wikipedia.org/wiki/Hamming_code
+    * TODO: optimize code later (pre-generate bitmasks => O(n))
     * */
 
     public static final int ECC_BIT = 14;

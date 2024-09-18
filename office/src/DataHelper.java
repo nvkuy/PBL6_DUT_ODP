@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.BitSet;
 
 import static java.lang.Math.min;
@@ -49,6 +48,8 @@ public class DataHelper {
 
         return result;
     }
+
+
 
     // UNIT TEST
 //    public static void main(String[] args) {
