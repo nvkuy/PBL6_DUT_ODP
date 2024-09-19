@@ -66,21 +66,23 @@ public class LocalErrorCorrecter {
 
     // UNIT TEST
 //    public static void main(String[] args) {
-//        byte[] arr = {1, 2, 4, 5, 1, 99, 127, 27};
-//        BitSet data = BitSet.valueOf(arr);
-////        System.out.println(data.length());
+//        byte[] arr = {1, 0, 2, 4, 5, 1, 99, 127, 27, -128, 0, 0};
+////        byte[] arr = new byte[1022];
+////        arr[1021] = 2;
+//        BitSet data = DataHelper.bytesToBitSet(arr);
+//        System.out.println(data.length());
 ////        System.out.println(data);
 //        try {
 //            data = encode(data);
 ////            System.out.println(data.get(DECODE_SIZE - 1));
-////            System.out.println(data.length());
+//            System.out.println(data.length());
 ////            System.out.println(data);
 ////            data.flip(12); // create error
 //            data.flip(84); // create error
 //            if (correct(data)) {
 ////                System.out.println("YES");
 //                data = decode(data);
-//                System.out.println(Arrays.toString(data.toByteArray()));
+//                System.out.println(Arrays.toString(DataHelper.bitSetToBytes(data)));
 //            } else {
 //                System.out.println("Can't correct!");
 //            }
