@@ -25,11 +25,11 @@ public class GlobalErrorCorrecter {
         ma = mpf.ma;
     }
 
-    public void Init(long[] xs, long[] ys) {
+    public void init(long[] xs, long[] ys) {
         f = mpf.interpolate(xs, ys).expand(xs.length - 1);
     }
 
-    public long[] GetValues(long[] xs) {
+    public long[] getValues(long[] xs) {
         return f.multipointEval(xs);
     }
 

@@ -40,10 +40,10 @@ public class ScadaServer implements Runnable {
     private static final int OFFICE_PORT = 8888;
     private static final InetAddress OFFICE_ADDRESS = InetAddress.getLoopbackAddress(); // OFFICE_IP
 
-    private DatagramSocket socket;
+    private final DatagramSocket socket;
     private boolean running;
 
-    private ConcurrentLinkedQueue<String> dataQueue;
+    private final ConcurrentLinkedQueue<String> dataQueue;
 
     public ScadaServer() throws Exception {
         dataQueue = new ConcurrentLinkedQueue<>();
@@ -51,12 +51,12 @@ public class ScadaServer implements Runnable {
         running = true;
     }
 
-    public void StopServer() {
+    public void stopServer() {
         running = false;
         socket.close();
     }
 
-    public void SendFile(String filePath) {
+    public void sendFile(String filePath) {
         dataQueue.add(filePath);
     }
 
@@ -80,14 +80,14 @@ public class ScadaServer implements Runnable {
                 long[] xs = new long[ys.length];
                 for (int i = 0; i < ys.length; i++) xs[i] = i;
                 GlobalErrorCorrecter gec = new GlobalErrorCorrecter();
-                gec.Init(xs, ys);
+                gec.init(xs, ys);
                 int redundant_word = ceilDiv(xs.length * GlobalErrorCorrecter.REDUNDANT_PERCENT, 100);
                 int remainder_word = ((xs.length + redundant_word) * GlobalErrorCorrecter.WORD_LEN) % PACKET_DATA_SIZE;
                 if (remainder_word > 0)
                     redundant_word += PACKET_DATA_SIZE - remainder_word;
                 long[] xrs = new long[redundant_word];
                 for (int i = 0; i < redundant_word; i++) xrs[i] = i + xs.length;
-                long[] yrs = gec.GetValues(xrs);
+                long[] yrs = gec.getValues(xrs);
                 ys = DataHelper.concatLongs(ys, yrs);
 
                 data = DataHelper.longsToBytes(ys);

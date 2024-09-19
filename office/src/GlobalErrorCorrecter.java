@@ -9,7 +9,10 @@ public class GlobalErrorCorrecter {
      * TODO: optimize code later..
      * */
 
-    public static final long MOD = Const.MOD998244353;
+    public static final int WORD_LEN = 3; // in byte, 24 bit word < MOD
+    public static final int REDUNDANT_PERCENT = 10;
+
+    private static final long MOD = Const.MOD998244353;
     private static final ModArithmetic MA = ModArithmetic998244353.INSTANCE;
     private Convolution cnv;
     private ModPolynomialFactory mpf;
@@ -22,11 +25,11 @@ public class GlobalErrorCorrecter {
         ma = mpf.ma;
     }
 
-    public void Init(long[] xs, long[] ys) {
+    public void init(long[] xs, long[] ys) {
         f = mpf.interpolate(xs, ys).expand(xs.length - 1);
     }
 
-    public long[] GetValues(long[] xs) {
+    public long[] getValues(long[] xs) {
         return f.multipointEval(xs);
     }
 
@@ -34,7 +37,7 @@ public class GlobalErrorCorrecter {
 //    public static void main(String[] args) {
 //
 //        GlobalErrorCorrecter gec1 = new GlobalErrorCorrecter();
-//        long[] xs = {1, 2, 3, 4, 5}, ys = {4, 1, 2, 7, 4};
+//        long[] xs = {0, 2, 3, 4, 5}, ys = {4, 1, 2, 7, 4};
 //        gec1.Init(xs, ys);
 //        long[] xst1 = {6, 7};
 //        long[] yst1 = gec1.GetValues(xst1);
