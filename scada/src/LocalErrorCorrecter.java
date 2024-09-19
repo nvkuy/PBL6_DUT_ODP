@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.BitSet;
 
 public class LocalErrorCorrecter {
@@ -5,9 +6,10 @@ public class LocalErrorCorrecter {
     /*
     * using extended Hamming code to detect and correct 1-bit error in packet
     * https://en.wikipedia.org/wiki/Hamming_code
+    * TODO: optimize code later (pre-generate bitmasks => O(n))
     * */
 
-    public static final int ECC_BIT = 11;
+    public static final int ECC_BIT = 14;
     public static final int DECODE_SIZE = (1 << (ECC_BIT - 1));
     public static final int ENCODE_SIZE = DECODE_SIZE - ECC_BIT;
 
@@ -64,21 +66,23 @@ public class LocalErrorCorrecter {
 
     // UNIT TEST
 //    public static void main(String[] args) {
-//        byte[] arr = {1, 2, 4, 5, 1, 99, 127, 27};
-//        BitSet data = BitSet.valueOf(arr);
-////        System.out.println(data.length());
+//        byte[] arr = {1, 0, 2, 4, 5, 1, 99, 127, 27, -128, 0, 0};
+////        byte[] arr = new byte[1022];
+////        arr[1021] = 2;
+//        BitSet data = DataHelper.bytesToBitSet(arr);
+//        System.out.println(data.length());
 ////        System.out.println(data);
 //        try {
 //            data = encode(data);
 ////            System.out.println(data.get(DECODE_SIZE - 1));
-////            System.out.println(data.length());
+//            System.out.println(data.length());
 ////            System.out.println(data);
 ////            data.flip(12); // create error
 //            data.flip(84); // create error
 //            if (correct(data)) {
 ////                System.out.println("YES");
 //                data = decode(data);
-//                System.out.println(Arrays.toString(data.toByteArray()));
+//                System.out.println(Arrays.toString(DataHelper.bitSetToBytes(data)));
 //            } else {
 //                System.out.println("Can't correct!");
 //            }
