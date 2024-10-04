@@ -12,7 +12,6 @@ import static java.lang.Math.ceilDiv;
 public class ScadaServer implements Runnable {
 
     // TODO: may replace concurrent data structure by database later..
-    // TODO: may create class for packet structure later..
 
     private static final int OFFICE_PORT = 8888;
     private static final InetAddress OFFICE_ADDRESS = InetAddress.getLoopbackAddress(); // OFFICE_IP
