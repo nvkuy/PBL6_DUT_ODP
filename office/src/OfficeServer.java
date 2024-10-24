@@ -7,6 +7,9 @@ public class OfficeServer implements Runnable {
 
     // TODO: may replace concurrent data structure by database later..
 
+    private static final String FILE_PATH = "./receive_file/";
+    private static final int FILE_TIMEOUT = 10 * 1000;
+
     private static final int OFFICE_PORT = 8888;
     private static final int SCADA_PORT = 6969;
     private static final InetAddress SCADA_ADDRESS = InetAddress.getLoopbackAddress(); // SCADA_IP
@@ -18,7 +21,7 @@ public class OfficeServer implements Runnable {
 
     public OfficeServer() throws Exception {
         socket = new DatagramSocket(OFFICE_PORT);
-        fileHandler = new FileHandler();
+        fileHandler = new FileHandler(FILE_TIMEOUT, FILE_PATH);
         running = true;
     }
 

@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,17 +14,24 @@ public class FileHandler {
     public static final Integer STATE_RECEIVING = 2; // Receiving.
     public static final Integer STATE_RECEIVE_ENOUGH = 3; // Received enough data to construct the file, stop receiving.
 
-    public static final int FILE_RECEIVE_TIMEOUT = 10000;
-    private final ConcurrentLinkedQueue<Integer> receivingQueue;
-    private final ConcurrentHashMap<Integer, Integer> lastReceived;
-    private final ConcurrentHashMap<Integer, Integer> history;
+    public final int FILE_TIMEOUT;
+    public final String FILE_PATH;
+    private final ConcurrentHashMap<Integer, AtomicInteger> history;
     private final ConcurrentHashMap<Integer, DataPartHandler> receivingFiles;
 
-    public FileHandler() {
-        receivingQueue = new ConcurrentLinkedQueue<>();
-        lastReceived = new ConcurrentHashMap<>();
+    public FileHandler(int fileTimeOut, String filePath) {
+        FILE_TIMEOUT = fileTimeOut;
+        FILE_PATH = filePath;
         history = new ConcurrentHashMap<>();
         receivingFiles = new ConcurrentHashMap<>();
+    }
+
+    public void addFilePart(byte[] data) {
+
+    }
+
+    public int delTimeoutFilePart() {
+        return 0;
     }
 
     public class DataPartHandler {
@@ -33,7 +41,7 @@ public class FileHandler {
         private int numOfPartNeeded;
 
         private byte[][] data;
-        private AtomicInteger[] received;
+        private AtomicBoolean[] received;
         private AtomicInteger numPartReceived;
 
         private boolean isInit;
@@ -56,7 +64,7 @@ public class FileHandler {
                 numOfPartNeeded = ceilDiv(numOfWordNeeded, Packet.NUM_OF_WORD_PER_PACKET) * Packet.NUM_OF_WORD_PER_PACKET;
                 int maxNumOfPart = maxNumOfWord / Packet.NUM_OF_WORD_PER_PACKET;
                 data = new byte[maxNumOfPart][];
-                received = new AtomicInteger[maxNumOfPart];
+                received = new AtomicBoolean[maxNumOfPart];
                 numPartReceived = new AtomicInteger();
                 isInit = true;
             } finally {
@@ -65,8 +73,7 @@ public class FileHandler {
         }
 
         public void addPart(int partId, byte[] partData) {
-            if (received[partId].incrementAndGet() > 1) { // avoid duplicate udp packet
-                received[partId].decrementAndGet();
+            if (!received[partId].compareAndSet(false, true)) { // avoid duplicate udp packet
                 return;
             }
             if (numPartReceived.incrementAndGet() > numOfPartNeeded) { // ignore when received enough
@@ -114,7 +121,7 @@ public class FileHandler {
                 k = 0;
                 for (int i = 0; i < numOfPartNeeded; i++) {
                     if (data[i] == null) {
-                        data[i] = DataHelper.longsToBytes(Arrays.copyOfRange(yns, k, k + Packet.NUM_OF_WORD_PER_PACKET));
+                        data[i] = DataHelper.symbolsToBytes(Arrays.copyOfRange(yns, k, k + Packet.NUM_OF_WORD_PER_PACKET));
                         k += Packet.NUM_OF_WORD_PER_PACKET;
                     }
                 }

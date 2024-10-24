@@ -28,6 +28,14 @@ public class DataHelper {
         return result;
     }
 
+    public static byte[] stringToBytes(String s) {
+        return s.getBytes();
+    }
+
+    public static String getFileName(String path) {
+        return Paths.get(path).getFileName().toString();
+    }
+
     public static byte[] readFileBytes(String path) throws IOException {
         return Files.readAllBytes(Paths.get(path));
     }
@@ -53,7 +61,7 @@ public class DataHelper {
         return result;
     }
 
-    public static long[] bytesToLongs(byte[] data) throws Exception {
+    public static long[] bytesToSymbols(byte[] data) throws Exception {
         if (data.length % GlobalErrorCorrecter.WORD_LEN != 0) throw new Exception("Invalid data size!");
         long[] result = new long[data.length / GlobalErrorCorrecter.WORD_LEN];
         for (int i = 0; i < data.length; i += GlobalErrorCorrecter.WORD_LEN)
@@ -70,7 +78,7 @@ public class DataHelper {
         return result;
     }
 
-    public static byte[] longsToBytes(long[] data) {
+    public static byte[] symbolsToBytes(long[] data) {
         byte[] result = new byte[data.length * GlobalErrorCorrecter.WORD_LEN];
         for (int i = 0; i < data.length; i++) {
             byte[] tmp = longToBytes(data[i], GlobalErrorCorrecter.WORD_LEN);

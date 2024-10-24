@@ -13,6 +13,8 @@ public class ScadaServer implements Runnable {
 
     // TODO: may replace concurrent data structure by database later..
 
+    private static final int FILE_NAME_SIZE = 69; // Allow only 68 bytes, last byte use to determine length
+
     private static final int OFFICE_PORT = 8888;
     private static final InetAddress OFFICE_ADDRESS = InetAddress.getLoopbackAddress(); // OFFICE_IP
 
@@ -45,14 +47,25 @@ public class ScadaServer implements Runnable {
             String filePath = dataQueue.poll();
             try {
 
-                byte[] data = DataHelper.readFileBytes(filePath);
+                byte[] file_name = DataHelper.stringToBytes(DataHelper.getFileName(filePath));
+                byte[] file_data = DataHelper.readFileBytes(filePath);
+
+                if (file_name.length + 1 > FILE_NAME_SIZE) throw new Exception("File name too long!");
+
+                byte[] data = new byte[FILE_NAME_SIZE + file_data.length];
+                System.arraycopy(file_name, 0, data, 0, file_name.length);
+                byte lastByte = 0;
+                if (file_name[file_name.length - 1] == lastByte) lastByte++;
+                for (int i = file_name.length; i < FILE_NAME_SIZE; i++) data[i] = lastByte;
+                System.arraycopy(file_data, 0, data, FILE_NAME_SIZE, file_data.length);
+
                 data = Compresser.compress(data);
 
                 byte[] file_id = DataHelper.longToBytes(System.currentTimeMillis(), Packet.FILE_ID_SIZE);
                 byte[] num_of_bytes = DataHelper.longToBytes(data.length, Packet.NUM_OF_BYTES_SIZE);
 
                 data = DataHelper.addPaddingWord(data);
-                long[] ys = DataHelper.bytesToLongs(data);
+                long[] ys = DataHelper.bytesToSymbols(data);
                 long[] xs = new long[ys.length];
                 for (int i = 0; i < ys.length; i++) xs[i] = i;
                 GlobalErrorCorrecter gec = new GlobalErrorCorrecter();
@@ -66,7 +79,7 @@ public class ScadaServer implements Runnable {
                 long[] yrs = gec.getValues(xrs);
                 ys = DataHelper.concatLongs(ys, yrs);
 
-                data = DataHelper.longsToBytes(ys);
+                data = DataHelper.symbolsToBytes(ys);
                 xs = xrs = ys = yrs = null; // allow gc to clear data
                 byte[] buf = new byte[Packet.BUFFER_SIZE];
                 System.arraycopy(file_id, 0, buf, Packet.FILE_ID_START, Packet.FILE_ID_SIZE);
