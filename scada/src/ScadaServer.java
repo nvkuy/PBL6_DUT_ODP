@@ -4,6 +4,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
@@ -23,7 +26,11 @@ public class ScadaServer implements Runnable {
 
     private final ConcurrentLinkedQueue<String> dataQueue;
 
+    private static final int STRONG_THREAD = Math.ceilDiv(Runtime.getRuntime().availableProcessors() * 7, 10);
+    private final ExecutorService executorService;
+
     public ScadaServer() throws Exception {
+        executorService = Executors.newFixedThreadPool(STRONG_THREAD);
         dataQueue = new ConcurrentLinkedQueue<>();
         socket = new DatagramSocket();
         running = true;
@@ -38,16 +45,21 @@ public class ScadaServer implements Runnable {
         dataQueue.add(filePath);
     }
 
-    @Override
-    public void run() {
+    private class FileSender implements Runnable {
 
-        while (running) {
+        String filePath;
+        public FileSender(String filePath) {
+            this.filePath = filePath;
+        }
 
-            // TODO: try thread pool later..
-            String filePath = dataQueue.poll();
+
+        @Override
+        public void run() {
+
             try {
 
-                byte[] file_name = DataHelper.stringToBytes(DataHelper.getFileName(filePath));
+                long currentTime = System.currentTimeMillis();
+                byte[] file_name = DataHelper.stringToBytes(currentTime + "_" + DataHelper.getFileName(filePath));
                 byte[] file_data = DataHelper.readFileBytes(filePath);
 
                 if (file_name.length + 1 > FILE_NAME_SIZE) throw new Exception("File name too long!");
@@ -61,7 +73,7 @@ public class ScadaServer implements Runnable {
 
                 data = Compresser.compress(data);
 
-                byte[] file_id = DataHelper.longToBytes(System.currentTimeMillis(), Packet.FILE_ID_SIZE);
+                byte[] file_id = DataHelper.longToBytes(currentTime, Packet.FILE_ID_SIZE);
                 byte[] num_of_bytes = DataHelper.longToBytes(data.length, Packet.NUM_OF_BYTES_SIZE);
 
                 data = DataHelper.addPaddingWord(data);
@@ -99,8 +111,20 @@ public class ScadaServer implements Runnable {
 
 
             } catch (Exception e) {
+                // TODO: try retry later..
                 System.out.println("Error while sending file " + filePath + " " + e.getMessage());
             }
+
+        }
+    }
+
+    @Override
+    public void run() {
+
+        while (running) {
+
+            String filePath = dataQueue.poll();
+            executorService.execute(new FileSender(filePath));
 
         }
 

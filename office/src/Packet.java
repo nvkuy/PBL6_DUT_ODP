@@ -23,6 +23,7 @@ public abstract class Packet {
     public static final int NUM_OF_BYTES_START = FILE_ID_START + FILE_ID_SIZE;
     public static final int PACKET_ID_START = NUM_OF_BYTES_START + NUM_OF_BYTES_SIZE;
     public static final int PACKET_DATA_START = PACKET_ID_START + PACKET_ID_SIZE;
+    public static final int PACKET_DATA_END = PACKET_DATA_START + PACKET_DATA_SIZE;
     public static final int CHECKSUM_START = PACKET_DATA_START + PACKET_DATA_SIZE;
     public static final int CHECKSUM_END = CHECKSUM_START + CHECKSUM_SIZE;
     public static final int NUM_OF_WORD_PER_PACKET = PACKET_DATA_SIZE / GlobalErrorCorrecter.WORD_LEN;
