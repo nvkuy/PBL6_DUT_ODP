@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import static java.lang.Math.ceilDiv;
-import static java.lang.Math.min;
 
 public class DataHelper {
 
@@ -58,7 +57,7 @@ public class DataHelper {
     public static long bytesToLong(byte[] data, int start, int length) {
         long result = 0;
         for (int i = start; i < start + length; i++) result = (result << 8) | (data[i] & 0xff);
-        return result;
+        return result >> 8;
     }
 
     public static long[] bytesToSymbols(byte[] data) throws Exception {

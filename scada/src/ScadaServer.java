@@ -1,25 +1,25 @@
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 import static java.lang.Math.ceilDiv;
+import static java.lang.Math.min;
 
 public class ScadaServer implements Runnable {
 
     // TODO: may replace concurrent data structure by database later..
 
+    private static final boolean DEBUG = true;
     private static final int FILE_NAME_SIZE = 69; // Allow only 68 bytes, last byte use to determine length
 
     private static final int OFFICE_PORT = 8888;
+    private static final int SCADA_PORT = 6969;
     private static final InetAddress OFFICE_ADDRESS = InetAddress.getLoopbackAddress(); // OFFICE_IP
+    private static final InetAddress SCADA_ADDRESS = InetAddress.getLoopbackAddress(); // SCADA_IP
 
     private final DatagramSocket socket;
     private boolean running;
@@ -32,13 +32,19 @@ public class ScadaServer implements Runnable {
     public ScadaServer() throws Exception {
         executorService = Executors.newFixedThreadPool(STRONG_THREAD);
         dataQueue = new ConcurrentLinkedQueue<>();
-        socket = new DatagramSocket();
+        socket = new DatagramSocket(SCADA_PORT, SCADA_ADDRESS);
         running = true;
+        if (DEBUG) {
+            System.out.println("ScadaServer started!");
+        }
     }
 
     public void stopServer() {
         running = false;
         socket.close();
+        if (DEBUG) {
+            System.out.println("ScadaServer stopped!");
+        }
     }
 
     public void sendFile(String filePath) {
@@ -59,6 +65,10 @@ public class ScadaServer implements Runnable {
             try {
 
                 long currentTime = System.currentTimeMillis();
+                if (DEBUG) {
+                    System.out.println("File id: " + currentTime);
+                }
+
                 byte[] file_name = DataHelper.stringToBytes(currentTime + "_" + DataHelper.getFileName(filePath));
                 byte[] file_data = DataHelper.readFileBytes(filePath);
 
@@ -72,6 +82,11 @@ public class ScadaServer implements Runnable {
                 System.arraycopy(file_data, 0, data, FILE_NAME_SIZE, file_data.length);
 
                 data = Compresser.compress(data);
+
+                if (DEBUG) {
+                    System.out.println("Sending file: " + filePath);
+                    System.out.println("File size(after compression): " + data.length);
+                }
 
                 byte[] file_id = DataHelper.longToBytes(currentTime, Packet.FILE_ID_SIZE);
                 byte[] num_of_bytes = DataHelper.longToBytes(data.length, Packet.NUM_OF_BYTES_SIZE);
@@ -92,6 +107,11 @@ public class ScadaServer implements Runnable {
                 ys = DataHelper.concatLongs(ys, yrs);
 
                 data = DataHelper.symbolsToBytes(ys);
+
+                if (DEBUG) {
+                    System.out.println("File size(after add redundant): " + data.length);
+                }
+
                 xs = xrs = ys = yrs = null; // allow gc to clear data
                 byte[] buf = new byte[Packet.BUFFER_SIZE];
                 System.arraycopy(file_id, 0, buf, Packet.FILE_ID_START, Packet.FILE_ID_SIZE);
@@ -99,7 +119,7 @@ public class ScadaServer implements Runnable {
                 for (int i = 0; i < data.length; i += Packet.PACKET_DATA_SIZE) {
                     byte[] packet_id = DataHelper.longToBytes(i, Packet.PACKET_ID_SIZE);
                     System.arraycopy(packet_id, 0, buf, Packet.PACKET_ID_START, Packet.PACKET_ID_SIZE);
-                    System.arraycopy(data, i, buf, Packet.PACKET_DATA_START, Packet.PACKET_DATA_SIZE);
+                    System.arraycopy(data, i, buf, Packet.PACKET_DATA_START, min(Packet.PACKET_DATA_SIZE, data.length - i));
                     byte[] tmp = new byte[Packet.CHECKSUM_START];
                     System.arraycopy(buf, 0, tmp, 0, Packet.CHECKSUM_START);
                     byte[] checksum = Hasher.hash(tmp);
@@ -109,10 +129,17 @@ public class ScadaServer implements Runnable {
                     socket.send(packet);
                 }
 
+                if (DEBUG) {
+                    System.out.println("Send completed!");
+                }
+
 
             } catch (Exception e) {
                 // TODO: try retry later..
                 System.out.println("Error while sending file " + filePath + " " + e.getMessage());
+                if (DEBUG) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -123,6 +150,13 @@ public class ScadaServer implements Runnable {
 
         while (running) {
 
+            while (dataQueue.isEmpty()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             String filePath = dataQueue.poll();
             executorService.execute(new FileSender(filePath));
 
