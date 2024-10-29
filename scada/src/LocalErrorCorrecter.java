@@ -10,7 +10,7 @@ public class LocalErrorCorrecter {
 
     public static final int ECC_BIT = 14;
     public static final int DECODE_SIZE = (1 << (ECC_BIT - 1));
-    public static final int ENCODE_SIZE = DECODE_SIZE - ECC_BIT;
+    public static final int ENCODE_SIZE = ((DECODE_SIZE - ECC_BIT) / 8) * 8;
 
     public static BitSet encode(BitSet data) throws Exception {
         if (data.length() > ENCODE_SIZE) throw new Exception("Invalid data size!");
@@ -65,9 +65,9 @@ public class LocalErrorCorrecter {
 
     // UNIT TEST
 //    public static void main(String[] args) {
-//        byte[] arr = {1, 0, 2, 4, 5, 1, 99, 127, 27, -128, 0, 0};
-////        byte[] arr = new byte[1022];
-////        arr[1021] = 2;
+////        byte[] arr = {1, 0, 2, 4, 5, 1, 99, 127, 27, -128, 0, 0};
+//        byte[] arr = new byte[1022];
+//        arr[1021] = 2;
 //        BitSet data = DataHelper.bytesToBitSet(arr);
 //        System.out.println(data.length());
 ////        System.out.println(data);
@@ -81,7 +81,7 @@ public class LocalErrorCorrecter {
 //            if (correct(data)) {
 ////                System.out.println("YES");
 //                data = decode(data);
-//                System.out.println(Arrays.toString(DataHelper.bitSetToBytes(data)));
+//                System.out.println(Arrays.toString(DataHelper.bitSetToBytes(data, arr.length)));
 //            } else {
 //                System.out.println("Can't correct!");
 //            }
