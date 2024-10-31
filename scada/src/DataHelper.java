@@ -44,14 +44,11 @@ public class DataHelper {
     }
 
     public static BitSet bytesToBitSet(byte[] data) {
-        data = Arrays.copyOf(data, data.length + 1);
-        data[data.length - 1] = 1;
         return BitSet.valueOf(data);
     }
 
-    public static byte[] bitSetToBytes(BitSet bitSet) {
-        byte[] result = bitSet.toByteArray();
-        return Arrays.copyOf(result, result.length - 1);
+    public static byte[] bitSetToBytes(BitSet bitSet, int length) {
+        return Arrays.copyOf(bitSet.toByteArray(), length);
     }
 
     public static long bytesToLong(byte[] data, int start, int length) {

@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,7 +70,7 @@ public class OfficeServer implements Runnable {
                 socket.receive(packet);
                 if (!packet.getAddress().equals(SCADA_ADDRESS) || packet.getPort() != SCADA_PORT)
                     throw new Exception("Invalid SCADA packet " + packet.getAddress() + ":" + packet.getPort());
-                Thread.startVirtualThread(new FileRegister(buffer));
+                executorService.execute(new PacketHandler(buffer));
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 if (DEBUG) {
@@ -176,12 +177,41 @@ public class OfficeServer implements Runnable {
         }
     }
 
-    // TODO: add thread verify hamming code..
+    private class PacketHandler implements Runnable {
+
+        /*
+         * os, long-live thread use to process packet(hamming code)
+         */
+
+        private final byte[] data;
+
+        private PacketHandler(byte[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public void run() {
+
+            BitSet bits = DataHelper.bytesToBitSet(data);
+            try {
+                if (LocalErrorCorrecter.correct(bits)) {
+                    bits = LocalErrorCorrecter.decode(bits);
+                    Thread.startVirtualThread(new FileRegister(DataHelper.bitSetToBytes(bits, LocalErrorCorrecter.ENCODE_SIZE)));
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                if (DEBUG) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
 
     private class FileHandler implements Runnable {
 
         /*
-         * os, long-live thread use to process packet and construct final file
+         * os, long-live thread use to process part and construct final file
          */
 
         private final File file;

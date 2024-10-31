@@ -124,7 +124,7 @@ public class ScadaServer implements Runnable {
                     System.arraycopy(buf, 0, tmp, 0, Packet.CHECKSUM_START);
                     byte[] checksum = Hasher.hash(tmp);
                     System.arraycopy(checksum, 0, buf, Packet.CHECKSUM_START, Packet.CHECKSUM_SIZE);
-                    buf = DataHelper.bitSetToBytes(LocalErrorCorrecter.encode(DataHelper.bytesToBitSet(Arrays.copyOf(buf, Packet.CHECKSUM_END))));
+                    buf = DataHelper.bitSetToBytes(LocalErrorCorrecter.encode(DataHelper.bytesToBitSet(Arrays.copyOf(buf, Packet.CHECKSUM_END))), LocalErrorCorrecter.DECODE_SIZE);
                     DatagramPacket packet = new DatagramPacket(buf, buf.length, OFFICE_ADDRESS, OFFICE_PORT);
                     socket.send(packet);
                 }
