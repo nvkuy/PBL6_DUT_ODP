@@ -2,6 +2,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -41,6 +42,8 @@ public class OfficeServer implements Runnable {
         registerLocks = new ConcurrentHashMap<>();
         files = new ConcurrentHashMap<>();
         running = true;
+
+        Files.createDirectories(Paths.get(FILE_PATH));
 
         if (DEBUG) {
             System.out.println("OfficeServer started!");
@@ -90,7 +93,7 @@ public class OfficeServer implements Runnable {
         * 2. Push task to os thread do computational intensive task
         */
 
-        private byte[] data;
+        private final byte[] data;
 
         public FileRegister(byte[] data) {
             this.data = data;
@@ -110,7 +113,7 @@ public class OfficeServer implements Runnable {
             registerLocks.putIfAbsent(fileId, new ReentrantReadWriteLock());
             ReadWriteLock initLock = registerLocks.get(fileId);
 
-            // Notes: no try-finally because no exception
+            // Notes: no try-finally because no exception, may need add later..
             initLock.readLock().lock();
             File file = files.get(fileId);
             if (file == null) {
@@ -196,7 +199,7 @@ public class OfficeServer implements Runnable {
             try {
                 if (LocalErrorCorrecter.correct(bits)) {
                     bits = LocalErrorCorrecter.decode(bits);
-                    Thread.startVirtualThread(new FileRegister(DataHelper.bitSetToBytes(bits, LocalErrorCorrecter.ENCODE_SIZE)));
+                    Thread.startVirtualThread(new FileRegister(DataHelper.bitSetToBytes(bits, LocalErrorCorrecter.ENCODE_BYTE_SIZE)));
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());

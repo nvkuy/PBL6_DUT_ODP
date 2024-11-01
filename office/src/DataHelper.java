@@ -54,7 +54,7 @@ public class DataHelper {
     public static long bytesToLong(byte[] data, int start, int length) {
         long result = 0;
         for (int i = start; i < start + length; i++) result = (result << 8) | (data[i] & 0xff);
-        return result >> 8;
+        return result;
     }
 
     public static long[] bytesToSymbols(byte[] data) throws Exception {
@@ -65,6 +65,7 @@ public class DataHelper {
         return result;
     }
 
+    // note: don't use longToBytes with number < 0
     public static byte[] longToBytes(long value, int n) {
         byte[] result = new byte[n];
         for (int i = n - 1; i >= 0; i--) {
@@ -85,19 +86,27 @@ public class DataHelper {
 
 
     // UNIT TEST
-//    public static void main(String[] args) {
+//    public static void main(String[] args) throws Exception {
 //
-//        byte[] a = {1, 2, 55, 127, -128, 0, 5, 8, 77, 22, 1};
+////        byte[] a = {1, 2, 55, 127, -128, 0, 5, 8, 77, 22, 1};
+//////        byte[] a = {-128, -128, -128, 127, 127, 0};
+////        long[] b = null;
+////        try {
+////            b = bytesToSymbols(addPaddingWord(a));
+////            System.out.println(Arrays.toString(b));
+////            System.out.println(Arrays.toString(removePaddingWord(symbolsToBytes(b), a.length)));
+////        } catch (Exception e) {
+////            System.out.println(Arrays.toString(addPaddingWord(a)));
+////            throw new RuntimeException(e);
+////        }
+//
 ////        byte[] a = {-128, -128, -128, 127, 127, 0};
-//        long[] b = null;
-//        try {
-//            b = bytesToLongs(addPaddingWord(a));
-//            System.out.println(Arrays.toString(b));
-//            System.out.println(Arrays.toString(removePaddingWord(longsToBytes(b), a.length)));
-//        } catch (Exception e) {
-//            System.out.println(Arrays.toString(addPaddingWord(a)));
-//            throw new RuntimeException(e);
-//        }
+////        byte[] b = symbolsToBytes(bytesToSymbols(a));
+////        System.out.println(Arrays.toString(b));
+//
+////        byte[] a = {-127, -127, -127, -127, -127, -127, -127, -127};
+////        System.out.println(bytesToLong(a, 0, a.length));
+//
 //
 //    }
 

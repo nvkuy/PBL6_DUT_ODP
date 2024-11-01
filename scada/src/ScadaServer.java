@@ -53,7 +53,7 @@ public class ScadaServer implements Runnable {
 
     private class FileSender implements Runnable {
 
-        String filePath;
+        private final String filePath;
         public FileSender(String filePath) {
             this.filePath = filePath;
         }
@@ -70,9 +70,9 @@ public class ScadaServer implements Runnable {
                 }
 
                 byte[] file_name = DataHelper.stringToBytes(currentTime + "_" + DataHelper.getFileName(filePath));
-                byte[] file_data = DataHelper.readFileBytes(filePath);
-
                 if (file_name.length + 1 > FILE_NAME_SIZE) throw new Exception("File name too long!");
+
+                byte[] file_data = DataHelper.readFileBytes(filePath);
 
                 byte[] data = new byte[FILE_NAME_SIZE + file_data.length];
                 System.arraycopy(file_name, 0, data, 0, file_name.length);
@@ -98,9 +98,9 @@ public class ScadaServer implements Runnable {
                 GlobalErrorCorrecter gec = new GlobalErrorCorrecter();
                 gec.init(xs, ys);
                 int redundant_word = ceilDiv(xs.length * GlobalErrorCorrecter.REDUNDANT_PERCENT, 100);
-                int remainder_word = ((xs.length + redundant_word) * GlobalErrorCorrecter.WORD_LEN) % Packet.PACKET_DATA_SIZE;
+                int remainder_word = (xs.length + redundant_word) % Packet.NUM_OF_WORD_PER_PACKET;
                 if (remainder_word > 0)
-                    redundant_word += Packet.PACKET_DATA_SIZE - remainder_word;
+                    redundant_word += Packet.NUM_OF_WORD_PER_PACKET - remainder_word;
                 long[] xrs = new long[redundant_word];
                 for (int i = 0; i < redundant_word; i++) xrs[i] = i + xs.length;
                 long[] yrs = gec.getValues(xrs);
@@ -113,19 +113,19 @@ public class ScadaServer implements Runnable {
                 }
 
                 xs = xrs = ys = yrs = null; // allow gc to clear data
-                byte[] buf = new byte[Packet.BUFFER_SIZE];
+                byte[] buf = new byte[LocalErrorCorrecter.ENCODE_BYTE_SIZE];
                 System.arraycopy(file_id, 0, buf, Packet.FILE_ID_START, Packet.FILE_ID_SIZE);
                 System.arraycopy(num_of_bytes, 0, buf, Packet.NUM_OF_BYTES_START, Packet.NUM_OF_BYTES_SIZE);
                 for (int i = 0; i < data.length; i += Packet.PACKET_DATA_SIZE) {
-                    byte[] packet_id = DataHelper.longToBytes(i, Packet.PACKET_ID_SIZE);
+                    byte[] packet_id = DataHelper.longToBytes(i / Packet.PACKET_DATA_SIZE, Packet.PACKET_ID_SIZE);
                     System.arraycopy(packet_id, 0, buf, Packet.PACKET_ID_START, Packet.PACKET_ID_SIZE);
-                    System.arraycopy(data, i, buf, Packet.PACKET_DATA_START, min(Packet.PACKET_DATA_SIZE, data.length - i));
+                    System.arraycopy(data, i, buf, Packet.PACKET_DATA_START, Packet.PACKET_DATA_SIZE);
                     byte[] tmp = new byte[Packet.CHECKSUM_START];
                     System.arraycopy(buf, 0, tmp, 0, Packet.CHECKSUM_START);
                     byte[] checksum = Hasher.hash(tmp);
                     System.arraycopy(checksum, 0, buf, Packet.CHECKSUM_START, Packet.CHECKSUM_SIZE);
-                    buf = DataHelper.bitSetToBytes(LocalErrorCorrecter.encode(DataHelper.bytesToBitSet(Arrays.copyOf(buf, Packet.CHECKSUM_END))), LocalErrorCorrecter.DECODE_SIZE);
-                    DatagramPacket packet = new DatagramPacket(buf, buf.length, OFFICE_ADDRESS, OFFICE_PORT);
+                    byte[] buffer = DataHelper.bitSetToBytes(LocalErrorCorrecter.encode(DataHelper.bytesToBitSet(buf)), LocalErrorCorrecter.DECODE_BYTE_SIZE);
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, OFFICE_ADDRESS, OFFICE_PORT);
                     socket.send(packet);
                 }
 

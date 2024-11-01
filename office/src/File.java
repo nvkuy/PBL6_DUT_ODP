@@ -46,7 +46,6 @@ public class File {
         DataHelper.writeFileBytes(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length));
         data = null; // allow gc clear data
         state.set(STATE_RECEIVE_SUCCESS);
-//        System.out.println("OK!");
         return true;
     }
 

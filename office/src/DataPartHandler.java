@@ -16,13 +16,14 @@ public class DataPartHandler {
 
     public DataPartHandler(int numOfBytes) {
         this.numOfBytes = numOfBytes;
-        numOfWordNeeded = ceilDiv(numOfBytes, GlobalErrorCorrecter.WORD_LEN) * GlobalErrorCorrecter.WORD_LEN;
+        numOfWordNeeded = ceilDiv(numOfBytes, GlobalErrorCorrecter.WORD_LEN);
         int redundantWord = ceilDiv(numOfWordNeeded * GlobalErrorCorrecter.REDUNDANT_PERCENT, 100);
         int maxNumOfWord = ceilDiv(numOfWordNeeded + redundantWord, Packet.NUM_OF_WORD_PER_PACKET) * Packet.NUM_OF_WORD_PER_PACKET;
-        numOfPartNeeded = ceilDiv(numOfWordNeeded, Packet.NUM_OF_WORD_PER_PACKET) * Packet.NUM_OF_WORD_PER_PACKET;
+        numOfPartNeeded = ceilDiv(numOfWordNeeded, Packet.NUM_OF_WORD_PER_PACKET);
         int maxNumOfPart = maxNumOfWord / Packet.NUM_OF_WORD_PER_PACKET;
         data = new byte[maxNumOfPart][];
         received = new AtomicBoolean[maxNumOfPart];
+        for (int i = 0; i < maxNumOfPart; i++) received[i] = new AtomicBoolean();
         numPartReceived = new AtomicInteger();
     }
 
@@ -38,7 +39,7 @@ public class DataPartHandler {
     }
 
     public boolean isDone() {
-        return numPartReceived.get() >= numOfPartNeeded; // may need atomic int
+        return numPartReceived.get() >= numOfPartNeeded;
     }
 
     public byte[] getFileBytes() {

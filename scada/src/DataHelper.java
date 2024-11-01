@@ -65,6 +65,7 @@ public class DataHelper {
         return result;
     }
 
+    // note: don't use longToBytes with number < 0
     public static byte[] longToBytes(long value, int n) {
         byte[] result = new byte[n];
         for (int i = n - 1; i >= 0; i--) {
