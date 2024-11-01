@@ -27,6 +27,14 @@ public class DataHelper {
         return result;
     }
 
+    public static byte[] stringToBytes(String s) {
+        return s.getBytes();
+    }
+
+    public static String getFileName(String path) {
+        return Paths.get(path).getFileName().toString();
+    }
+
     public static byte[] readFileBytes(String path) throws IOException {
         return Files.readAllBytes(Paths.get(path));
     }
@@ -36,14 +44,11 @@ public class DataHelper {
     }
 
     public static BitSet bytesToBitSet(byte[] data) {
-        data = Arrays.copyOf(data, data.length + 1);
-        data[data.length - 1] = 1;
         return BitSet.valueOf(data);
     }
 
-    public static byte[] bitSetToBytes(BitSet bitSet) {
-        byte[] result = bitSet.toByteArray();
-        return Arrays.copyOf(result, result.length - 1);
+    public static byte[] bitSetToBytes(BitSet bitSet, int length) {
+        return Arrays.copyOf(bitSet.toByteArray(), length);
     }
 
     public static long bytesToLong(byte[] data, int start, int length) {
@@ -52,7 +57,7 @@ public class DataHelper {
         return result;
     }
 
-    public static long[] bytesToLongs(byte[] data) throws Exception {
+    public static long[] bytesToSymbols(byte[] data) throws Exception {
         if (data.length % GlobalErrorCorrecter.WORD_LEN != 0) throw new Exception("Invalid data size!");
         long[] result = new long[data.length / GlobalErrorCorrecter.WORD_LEN];
         for (int i = 0; i < data.length; i += GlobalErrorCorrecter.WORD_LEN)
@@ -60,6 +65,7 @@ public class DataHelper {
         return result;
     }
 
+    // note: don't use longToBytes with number < 0
     public static byte[] longToBytes(long value, int n) {
         byte[] result = new byte[n];
         for (int i = n - 1; i >= 0; i--) {
@@ -69,7 +75,7 @@ public class DataHelper {
         return result;
     }
 
-    public static byte[] longsToBytes(long[] data) {
+    public static byte[] symbolsToBytes(long[] data) {
         byte[] result = new byte[data.length * GlobalErrorCorrecter.WORD_LEN];
         for (int i = 0; i < data.length; i++) {
             byte[] tmp = longToBytes(data[i], GlobalErrorCorrecter.WORD_LEN);
@@ -80,19 +86,27 @@ public class DataHelper {
 
 
     // UNIT TEST
-//    public static void main(String[] args) {
+//    public static void main(String[] args) throws Exception {
 //
-//        byte[] a = {1, 2, 55, 127, -128, 0, 5, 8, 77, 22, 1};
+////        byte[] a = {1, 2, 55, 127, -128, 0, 5, 8, 77, 22, 1};
+//////        byte[] a = {-128, -128, -128, 127, 127, 0};
+////        long[] b = null;
+////        try {
+////            b = bytesToSymbols(addPaddingWord(a));
+////            System.out.println(Arrays.toString(b));
+////            System.out.println(Arrays.toString(removePaddingWord(symbolsToBytes(b), a.length)));
+////        } catch (Exception e) {
+////            System.out.println(Arrays.toString(addPaddingWord(a)));
+////            throw new RuntimeException(e);
+////        }
+//
 ////        byte[] a = {-128, -128, -128, 127, 127, 0};
-//        long[] b = null;
-//        try {
-//            b = bytesToLongs(addPaddingWord(a));
-//            System.out.println(Arrays.toString(b));
-//            System.out.println(Arrays.toString(removePaddingWord(longsToBytes(b), a.length)));
-//        } catch (Exception e) {
-//            System.out.println(Arrays.toString(addPaddingWord(a)));
-//            throw new RuntimeException(e);
-//        }
+////        byte[] b = symbolsToBytes(bytesToSymbols(a));
+////        System.out.println(Arrays.toString(b));
+//
+////        byte[] a = {-127, -127, -127, -127, -127, -127, -127, -127};
+////        System.out.println(bytesToLong(a, 0, a.length));
+//
 //
 //    }
 
