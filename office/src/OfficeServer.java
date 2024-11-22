@@ -110,7 +110,7 @@ public class OfficeServer implements Runnable {
                 System.out.println("Received part of file: " + fileId);
             }
 
-            registerLocks.putIfAbsent(fileId, new ReentrantReadWriteLock());
+            registerLocks.putIfAbsent(fileId, new ReentrantReadWriteLock(true));
             ReadWriteLock initLock = registerLocks.get(fileId);
 
             // Notes: no try-finally because no exception, may need add later..
@@ -234,6 +234,11 @@ public class OfficeServer implements Runnable {
                 byte[] checksum = Hasher.hash(Arrays.copyOfRange(data, 0, Packet.PACKET_DATA_END));
                 for (int i = 0; i < Packet.CHECKSUM_SIZE; i++)
                     if (checksum[i] != data[Packet.CHECKSUM_START + i]) return;
+
+//                if (DEBUG) {
+//                    // create error..
+//                    if (partId == 0) return;
+//                }
 
                 file.addPart(partId, partData);
                 if (file.getState() == File.STATE_RECEIVE_ENOUGH && file.saveFile(FILE_PATH)) {

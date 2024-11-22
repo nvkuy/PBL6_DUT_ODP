@@ -75,10 +75,10 @@ public class ScadaServer implements Runnable {
                 byte[] file_data = DataHelper.readFileBytes(filePath);
 
                 byte[] data = new byte[FILE_NAME_SIZE + file_data.length];
-                System.arraycopy(file_name, 0, data, 0, file_name.length);
                 byte lastByte = 0;
                 if (file_name[file_name.length - 1] == lastByte) lastByte++;
                 for (int i = file_name.length; i < FILE_NAME_SIZE; i++) data[i] = lastByte;
+                System.arraycopy(file_name, 0, data, 0, file_name.length);
                 System.arraycopy(file_data, 0, data, FILE_NAME_SIZE, file_data.length);
 
                 data = Compresser.compress(data);
