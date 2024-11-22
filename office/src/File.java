@@ -38,11 +38,12 @@ public class File {
 //        assert state.get() == STATE_RECEIVE_ENOUGH;
         if (!state.compareAndSet(STATE_RECEIVE_ENOUGH, STATE_SAVING)) return false;
         byte[] rawFile = data.getFileBytes();
-        rawFile = Compresser.decompress(rawFile);
-        String tmp = new String(Arrays.copyOfRange(rawFile, 0, FILE_NAME_SIZE));
+//        rawFile = Compresser.decompress(rawFile);
+        byte[] tmp = Arrays.copyOfRange(rawFile, 0, FILE_NAME_SIZE);
         int last = FILE_NAME_SIZE - 2;
-        while (tmp.charAt(last) == tmp.charAt(last + 1)) last--;
-        String fileName = System.currentTimeMillis() + "_" + tmp.substring(0, last + 1);
+        while (tmp[last] == tmp[last + 1]) last--;
+        String fileName = System.currentTimeMillis() + "_" + new String(Arrays.copyOfRange(tmp, 0, last + 1));
+        System.out.println(fileName);
         DataHelper.writeFileBytes(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length));
         data = null; // allow gc clear data
         state.set(STATE_RECEIVE_SUCCESS);

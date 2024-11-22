@@ -55,6 +55,7 @@ public class DataPartHandler {
                 if (data[i] != null) {
                     int startId = i * Packet.NUM_OF_WORD_PER_PACKET;
                     for (int j = 0; j < data[i].length; j += GlobalErrorCorrecter.WORD_LEN) {
+                        if (k >= numOfWordNeeded) break;
                         xs[k] = startId++;
                         ys[k++] = DataHelper.bytesToLong(data[i], j, GlobalErrorCorrecter.WORD_LEN);
                     }

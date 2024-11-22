@@ -38,7 +38,7 @@ public class ScadaServer implements Runnable {
 
     private final ConcurrentLinkedQueue<String> dataQueue;
 
-    private static final int STRONG_THREAD = Math.ceilDiv(Runtime.getRuntime().availableProcessors() * 7, 10);
+    private static final int STRONG_THREAD = Runtime.getRuntime().availableProcessors() * 2;
     private final ExecutorService executorService;
 
     public ScadaServer() throws Exception {
@@ -91,13 +91,13 @@ public class ScadaServer implements Runnable {
                 }
 
                 byte[] data = new byte[FILE_NAME_SIZE + file_data.length];
-                System.arraycopy(file_name, 0, data, 0, file_name.length);
-                byte lastByte = 0;
-                if (file_name[file_name.length - 1] == lastByte) lastByte++;
+                byte lastByte = 69;
+                if (file_name[file_name.length - 1] == lastByte) lastByte = 96;
                 for (int i = file_name.length; i < FILE_NAME_SIZE; i++) data[i] = lastByte;
+                System.arraycopy(file_name, 0, data, 0, file_name.length);
                 System.arraycopy(file_data, 0, data, FILE_NAME_SIZE, file_data.length);
 
-                data = Compresser.compress(data);
+//                data = Compresser.compress(data);
 
                 if (DEBUG) {
                     System.out.println("Sending file: " + filePath);

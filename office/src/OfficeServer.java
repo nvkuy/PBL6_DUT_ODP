@@ -45,7 +45,7 @@ public class OfficeServer implements Runnable {
     private final ConcurrentHashMap<Long, ReadWriteLock> registerLocks;
     private final ConcurrentHashMap<Long, File> files;
 
-    private static final int STRONG_THREAD = Math.ceilDiv(Runtime.getRuntime().availableProcessors() * 7, 10);
+    private static final int STRONG_THREAD = Runtime.getRuntime().availableProcessors() * 2;
     private final ExecutorService executorService;
 
     public OfficeServer() throws Exception {
@@ -122,7 +122,7 @@ public class OfficeServer implements Runnable {
                 System.out.println("Received part of file: " + fileId);
             }
 
-            registerLocks.putIfAbsent(fileId, new ReentrantReadWriteLock());
+            registerLocks.putIfAbsent(fileId, new ReentrantReadWriteLock(true));
             ReadWriteLock initLock = registerLocks.get(fileId);
 
             // Notes: no try-finally because no exception, may need add later..
@@ -247,10 +247,10 @@ public class OfficeServer implements Runnable {
                 for (int i = 0; i < Packet.CHECKSUM_SIZE; i++)
                     if (checksum[i] != data[Packet.CHECKSUM_START + i]) return;
 
-//                if (DEBUG) {
-//                    // make error..
-//                    if (partId == 1) return;
-//                }
+                if (DEBUG) {
+                    // create error..
+                    if (partId == 0) return;
+                }
 
                 file.addPart(partId, partData);
                 if (file.getState() == File.STATE_RECEIVE_ENOUGH && file.saveFile(FILE_PATH)) {
