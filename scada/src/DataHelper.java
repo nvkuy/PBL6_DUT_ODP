@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -27,8 +29,12 @@ public class DataHelper {
         return result;
     }
 
-    public static byte[] stringToBytes(String s) {
-        return s.getBytes();
+    public static byte[] stringToBytes(String s) throws UnsupportedEncodingException {
+        return s.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public static String bytesToString(byte[] b) throws UnsupportedEncodingException {
+        return new String(b, StandardCharsets.UTF_8);
     }
 
     public static String getFileName(String path) {
@@ -86,26 +92,27 @@ public class DataHelper {
 
 
     // UNIT TEST
-//    public static void main(String[] args) {
+//    public static void main(String[] args) throws Exception {
 //
 ////        byte[] a = {1, 2, 55, 127, -128, 0, 5, 8, 77, 22, 1};
 //////        byte[] a = {-128, -128, -128, 127, 127, 0};
 ////        long[] b = null;
 ////        try {
-////            b = bytesToLongs(addPaddingWord(a));
+////            b = bytesToSymbols(addPaddingWord(a));
 ////            System.out.println(Arrays.toString(b));
-////            System.out.println(Arrays.toString(removePaddingWord(longsToBytes(b), a.length)));
+////            System.out.println(Arrays.toString(removePaddingWord(symbolsToBytes(b), a.length)));
 ////        } catch (Exception e) {
 ////            System.out.println(Arrays.toString(addPaddingWord(a)));
 ////            throw new RuntimeException(e);
 ////        }
 //
-////        long t1 = System.currentTimeMillis();
-////        byte[] t2 = longToBytes(t1, 8);
-////        long t3 = bytesToLong(t2, 0, 8);
-////
-////        System.out.println(t1 + " _ " + t3);
-////        System.out.println(Arrays.toString(t2));
+////        byte[] a = {-128, -128, -128, 127, 127, 0};
+////        byte[] b = symbolsToBytes(bytesToSymbols(a));
+////        System.out.println(Arrays.toString(b));
+//
+////        byte[] a = {-127, -127, -127, -127, -127, -127, -127, -127};
+////        System.out.println(bytesToLong(a, 0, a.length));
+//
 //
 //    }
 
