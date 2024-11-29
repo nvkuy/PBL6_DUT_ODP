@@ -10,6 +10,8 @@ public class Main {
 //        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/scada/src/GlobalErrorCorrecter.java");
 //        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/office/received/rs_nasa.pdf");
 //        server.sendFile("D:\\PBL6\\office\\received\\dft.pdf");
-        server.sendFile("D:\\PBL6\\office\\received\\justine.pdf");
+//        server.sendFile("D:\\PBL6\\office\\received\\justine.pdf");
+//        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/office/received/NovelPolynomialBasisFFT2016.pdf");
+        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/office/received/justine.pdf");
     }
 }

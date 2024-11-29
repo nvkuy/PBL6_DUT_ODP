@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -27,8 +29,12 @@ public class DataHelper {
         return result;
     }
 
-    public static byte[] stringToBytes(String s) {
-        return s.getBytes();
+    public static byte[] stringToBytes(String s) throws UnsupportedEncodingException {
+        return s.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public static String bytesToString(byte[] b) throws UnsupportedEncodingException {
+        return new String(b, StandardCharsets.UTF_8);
     }
 
     public static String getFileName(String path) {

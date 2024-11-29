@@ -42,8 +42,8 @@ public class File {
         byte[] tmp = Arrays.copyOfRange(rawFile, 0, FILE_NAME_SIZE);
         int last = FILE_NAME_SIZE - 2;
         while (tmp[last] == tmp[last + 1]) last--;
-        String fileName = System.currentTimeMillis() + "_" + new String(Arrays.copyOfRange(tmp, 0, last + 1));
-        System.out.println(fileName);
+
+        String fileName = System.currentTimeMillis() + "_" + DataHelper.bytesToString(Arrays.copyOfRange(tmp, 0, last + 1));
         DataHelper.writeFileBytes(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length));
         data = null; // allow gc clear data
         state.set(STATE_RECEIVE_SUCCESS);

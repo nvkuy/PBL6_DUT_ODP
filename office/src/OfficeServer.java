@@ -250,6 +250,7 @@ public class OfficeServer implements Runnable {
                 if (DEBUG) {
                     // create error..
                     if (partId == 0) return;
+
                 }
 
                 file.addPart(partId, partData);

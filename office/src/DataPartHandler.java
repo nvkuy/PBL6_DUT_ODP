@@ -75,7 +75,7 @@ public class DataPartHandler {
             long[] yns = gec.getValues(xns);
 
             k = 0;
-            for (int i = 0; i < numOfPartNeeded; i++) {
+            for (int i = 0; i < numOfPartNeeded && k < yns.length; i++) {
                 if (data[i] == null) {
                     data[i] = DataHelper.symbolsToBytes(Arrays.copyOfRange(yns, k, k + Packet.NUM_OF_WORD_PER_PACKET));
                     k += Packet.NUM_OF_WORD_PER_PACKET;
