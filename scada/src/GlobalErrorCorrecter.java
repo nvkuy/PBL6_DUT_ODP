@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Random;
 
 public class GlobalErrorCorrecter {
 
@@ -9,11 +10,11 @@ public class GlobalErrorCorrecter {
      * TODO: optimize code later..
      * */
 
-    public static final int WORD_LEN = 3; // in byte, 24 bit word < MOD
+    public static final int WORD_LEN = 2; // in byte, 16 bit word < MOD
     public static final int REDUNDANT_PERCENT = 10;
 
-    private static final long MOD = Const.MOD998244353;
-    private static final ModArithmetic MA = ModArithmetic998244353.INSTANCE;
+    private static final long MOD = Const.MOD65537;
+    private static final ModArithmetic MA = ModArithmetic65537.INSTANCE;
     private Convolution cnv;
     private ModPolynomialFactory mpf;
     private ModArithmetic ma;
@@ -27,6 +28,7 @@ public class GlobalErrorCorrecter {
 
     public void init(long[] xs, long[] ys) {
         f = mpf.interpolate(xs, ys).expand(xs.length - 1);
+//        System.out.println(Arrays.toString(f.getCoefs()));
     }
 
     public long[] getValues(long[] xs) {
@@ -36,20 +38,77 @@ public class GlobalErrorCorrecter {
     // UNIT TEST
 //    public static void main(String[] args) {
 //
-//        GlobalErrorCorrecter gec1 = new GlobalErrorCorrecter();
-//        long[] xs = {0, 2, 3, 4, 5}, ys = {4, 1, 2, 7, 4};
-//        gec1.Init(xs, ys);
-//        long[] xst1 = {6, 7};
-//        long[] yst1 = gec1.GetValues(xst1);
-//        System.out.println(Arrays.toString(yst1));
+//        int num = (1 << 17);
+//        int red = num / 10;
+//        Random rand = new Random();
 //
-//        long[] xst2 = {xs[0], xs[1], xs[2], xst1[0], xst1[1]};
-//        long[] yst2 = {ys[0], ys[1], ys[2], yst1[0], yst1[1]};
+//        long[] xs = new long[num];
+//        long[] ys = new long[num];
+//        for (int i = 0; i < num; i++) {
+//            xs[i] = i;
+//            ys[i] = rand.nextLong(1L << 24);
+////            ys[i] = rand.nextLong(ModArithmetic998244353.INSTANCE.getMod());
+//        }
+//
+//        for (int i = 1; i < num; i++) {
+//            int j = rand.nextInt(i);
+//            long tmp = xs[j];
+//            xs[j] = xs[i];
+//            xs[i] = tmp;
+//        }
+//
+//        long t1 = System.currentTimeMillis(), t2;
+//        GlobalErrorCorrecter gec1 = new GlobalErrorCorrecter();
+//        gec1.init(xs, ys);
+//        t2 = System.currentTimeMillis();
+//        System.out.println("Done interpolation 1: " + (t2 - t1));
+//
+//        long[] xsr = new long[red];
+//        long[] ysr;
+//        for (int i = 0; i < red; i++)
+//            xsr[i] = num + i;
+//        for (int i = 1; i < red; i++) {
+//            int j = rand.nextInt(i);
+//            long tmp = xsr[j];
+//            xsr[j] = xsr[i];
+//            xsr[i] = tmp;
+//        }
+//
+//        t1 = System.currentTimeMillis();
+//        ysr = gec1.getValues(xsr);
+//        t2 = System.currentTimeMillis();
+//        System.out.println("Done get values 1:" + (t2 - t1));
+//
+//        long[] rxs = new long[num];
+//        long[] rys = new long[num];
+//        for (int i = 0; i < num; i++) {
+//            if (i < red) {
+//                rxs[i] = xsr[i];
+//                rys[i] = ysr[i];
+//            } else {
+//                rxs[i] = xs[i];
+//                rys[i] = ys[i];
+//            }
+//        }
+//
+//        t1 = System.currentTimeMillis();
 //        GlobalErrorCorrecter gec2 = new GlobalErrorCorrecter();
-//        gec2.Init(xst2, yst2);
-//        long[] xst3 = {4, 5};
-//        long[] yst3 = gec2.GetValues(xst3);
-//        System.out.println(Arrays.toString(yst3));
+//        gec2.init(rxs, rys);
+//        t2 = System.currentTimeMillis();
+//        System.out.println("Done interpolation 2:" + (t2 - t1));
+//
+//        t1 = System.currentTimeMillis();
+//        long[] iys = gec2.getValues(xs);
+//        t2 = System.currentTimeMillis();
+//        System.out.println("Done get values 2:" + (t2 - t1));
+//
+//        for (int i = 0; i < num; i++) {
+//            if (iys[i] != ys[i]) {
+//                System.out.println("Error");
+//                    System.out.println(i + " " + xs[i] + " " + iys[i] + " " + ys[i]);
+//                break;
+//            }
+//        }
 //
 //    }
 
@@ -174,6 +233,7 @@ final class ConvolutionNTTPrime extends Convolution {
         if (m == 469762049) return 3;
         if (m == 754974721) return 11;
         if (m == 998244353) return 3;
+        if (m == 65537) return 3;
         int[] divs = new int[20];
         divs[0] = 2;
         int cnt = 1;
@@ -198,10 +258,10 @@ final class ConvolutionNTTPrime extends Convolution {
 }
 
 
-final class ModArithmetic998244353 implements ModArithmetic {
-    public static final ModArithmetic INSTANCE = new ModArithmetic998244353();
-    private ModArithmetic998244353(){}
-    private static final long MOD = Const.MOD998244353;
+final class ModArithmetic65537 implements ModArithmetic {
+    public static final ModArithmetic INSTANCE = new ModArithmetic65537();
+    private ModArithmetic65537(){}
+    private static final long MOD = Const.MOD65537;
     public long getMod() {return MOD;}
     public long mod(long a) {return (a %= MOD) < 0 ? a + MOD : a;}
     public long add(long a, long b) {return (a += b) >= MOD ? a - MOD : a;}
@@ -660,6 +720,7 @@ class Const {
     public static final long MOD754974721  = 754974721 ;
     public static final long MOD167772161  = 167772161 ;
     public static final long MOD469762049  = 469762049 ;
+    public static final long MOD65537 = 65537;
 
     public static final int[] dx8 = {1, 0, -1, 0, 1, -1, -1, 1};
     public static final int[] dy8 = {0, 1, 0, -1, 1, 1, -1, -1};

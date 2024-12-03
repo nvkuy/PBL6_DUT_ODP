@@ -118,10 +118,6 @@ public class OfficeServer implements Runnable {
             long fileId = DataHelper.bytesToLong(data, 0, Packet.FILE_ID_SIZE);
             int numOfBytes = (int) DataHelper.bytesToLong(data, Packet.NUM_OF_BYTES_START, Packet.NUM_OF_BYTES_SIZE);
 
-            if (DEBUG) {
-                System.out.println("Received part of file: " + fileId);
-            }
-
             registerLocks.putIfAbsent(fileId, new ReentrantReadWriteLock(true));
             ReadWriteLock initLock = registerLocks.get(fileId);
 
@@ -145,11 +141,11 @@ public class OfficeServer implements Runnable {
                 initLock.writeLock().unlock();
                 initLock.readLock().lock();
             }
+            initLock.readLock().unlock();
 
             if (file.getState() != File.STATE_RECEIVING) return;
             if (init) Thread.startVirtualThread(new FileTracker(file));
             executorService.execute(new FileHandler(file, data));
-            initLock.readLock().unlock();
 
         }
     }
@@ -209,6 +205,10 @@ public class OfficeServer implements Runnable {
 
             BitSet bits = DataHelper.bytesToBitSet(data);
             try {
+                if (DEBUG) {
+                    // create error
+                    bits.flip(84);
+                }
                 if (LocalErrorCorrecter.correct(bits)) {
                     bits = LocalErrorCorrecter.decode(bits);
                     Thread.startVirtualThread(new FileRegister(DataHelper.bitSetToBytes(bits, LocalErrorCorrecter.ENCODE_BYTE_SIZE)));
@@ -248,9 +248,12 @@ public class OfficeServer implements Runnable {
                     if (checksum[i] != data[Packet.CHECKSUM_START + i]) return;
 
                 if (DEBUG) {
-                    // create error..
+                    System.out.println("Received part id: " + partId);
+//                    if (partId == 0) {
+//                        System.out.println(Arrays.toString(partData));
+//                    }
+                    // create packet loss
                     if (partId == 0) return;
-
                 }
 
                 file.addPart(partId, partData);

@@ -34,11 +34,9 @@ public class File {
     }
 
     public boolean saveFile(String path) throws Exception {
-//        System.out.println("Saving file " + path);
-//        assert state.get() == STATE_RECEIVE_ENOUGH;
         if (!state.compareAndSet(STATE_RECEIVE_ENOUGH, STATE_SAVING)) return false;
         byte[] rawFile = data.getFileBytes();
-//        rawFile = Compresser.decompress(rawFile);
+        rawFile = Compresser.decompress(rawFile);
         byte[] tmp = Arrays.copyOfRange(rawFile, 0, FILE_NAME_SIZE);
         int last = FILE_NAME_SIZE - 2;
         while (tmp[last] == tmp[last + 1]) last--;

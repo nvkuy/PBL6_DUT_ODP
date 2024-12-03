@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -97,7 +98,7 @@ public class ScadaServer implements Runnable {
                 System.arraycopy(file_name, 0, data, 0, file_name.length);
                 System.arraycopy(file_data, 0, data, FILE_NAME_SIZE, file_data.length);
 
-//                data = Compresser.compress(data);
+                data = Compresser.compress(data);
 
                 if (DEBUG) {
                     System.out.println("Sending file: " + filePath);
@@ -124,6 +125,23 @@ public class ScadaServer implements Runnable {
 
                 data = DataHelper.symbolsToBytes(ys);
 
+//                int fuck_len = xs.length;
+//                xs = DataHelper.concatLongs(xs, xrs);
+//                GlobalErrorCorrecter gec2 = new GlobalErrorCorrecter();
+//                long[] f1 = Arrays.copyOfRange(xs, 330, fuck_len + 330);
+//                long[] f2 = Arrays.copyOfRange(ys, 330, fuck_len + 330);
+//                gec2.init(f1, f2);
+//                long[] fuck = gec2.getValues(xs);
+//                for (int i = 0; i < ys.length; i++) {
+//                    if (ys[i] != fuck[i]) {
+//                        System.out.println("Error");
+//                    }
+//                }
+//                FileWriter writer = new FileWriter("fuck.txt");
+//                for (int i = 0; i < f1.length; i++)
+//                    writer.write(f1[i] + " " + f2[i] + "\n");
+//                writer.close();
+
                 if (DEBUG) {
                     System.out.println("File size(after add redundant): " + data.length);
                 }
@@ -143,6 +161,10 @@ public class ScadaServer implements Runnable {
                     byte[] buffer = DataHelper.bitSetToBytes(LocalErrorCorrecter.encode(DataHelper.bytesToBitSet(buf)), LocalErrorCorrecter.DECODE_BYTE_SIZE);
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, OFFICE_ADDRESS, OFFICE_PORT);
                     socket.send(packet);
+//                    if (i / Packet.PACKET_DATA_SIZE == 406) {
+//                        byte[] fuck = Arrays.copyOfRange(buf, Packet.PACKET_DATA_START, Packet.PACKET_DATA_END);
+//                        System.out.println(Arrays.toString(fuck));
+//                    }
                 }
 
                 if (DEBUG) {

@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,8 +12,8 @@ public class DataPartHandler {
     private final int numOfPartNeeded;
 
     private final byte[][] data;
-    private final AtomicBoolean[] received;
-    private final AtomicInteger numPartReceived;
+    private final AtomicBoolean[] receiveState;
+    private final AtomicInteger numPartWaiting, numPartReceived;
 
     public DataPartHandler(int numOfBytes) {
         this.numOfBytes = numOfBytes;
@@ -22,20 +23,24 @@ public class DataPartHandler {
         numOfPartNeeded = ceilDiv(numOfWordNeeded, Packet.NUM_OF_WORD_PER_PACKET);
         int maxNumOfPart = maxNumOfWord / Packet.NUM_OF_WORD_PER_PACKET;
         data = new byte[maxNumOfPart][];
-        received = new AtomicBoolean[maxNumOfPart];
-        for (int i = 0; i < maxNumOfPart; i++) received[i] = new AtomicBoolean();
+        receiveState = new AtomicBoolean[maxNumOfPart];
+        for (int i = 0; i < maxNumOfPart; i++) receiveState[i] = new AtomicBoolean();
+        numPartWaiting = new AtomicInteger();
         numPartReceived = new AtomicInteger();
     }
 
     public void addPart(int partId, byte[] partData) {
-        if (!received[partId].compareAndSet(false, true)) { // avoid duplicate udp packet
+        if (!receiveState[partId].compareAndSet(false, true)) { // avoid duplicate udp packet
             return;
         }
-        if (numPartReceived.incrementAndGet() > numOfPartNeeded) { // ignore when received enough
-            numPartReceived.decrementAndGet();
+        if (numPartWaiting.incrementAndGet() > numOfPartNeeded) { // ignore when received enough
+            numPartWaiting.decrementAndGet();
             return;
         }
         data[partId] = partData;
+//        if (partId == 406)
+//            System.out.println(Arrays.toString(partData));
+        numPartReceived.incrementAndGet();
     }
 
     public boolean isDone() {
@@ -43,6 +48,7 @@ public class DataPartHandler {
     }
 
     public byte[] getFileBytes() {
+        assert isDone();
         int lostPartCount = 0;
         for (int i = 0; i < numOfPartNeeded; i++) lostPartCount += (data[i] == null ? 1 : 0);
 
@@ -51,7 +57,8 @@ public class DataPartHandler {
             long[] ys = new long[numOfWordNeeded];
             long[] xs = new long[numOfWordNeeded];
             int k = 0;
-            for (int i = 0; i < received.length; i++) {
+            for (int i = 0; i < data.length; i++) {
+                if (k >= numOfWordNeeded) break;
                 if (data[i] != null) {
                     int startId = i * Packet.NUM_OF_WORD_PER_PACKET;
                     for (int j = 0; j < data[i].length; j += GlobalErrorCorrecter.WORD_LEN) {
@@ -61,6 +68,7 @@ public class DataPartHandler {
                     }
                 }
             }
+            assert k == numOfWordNeeded;
 
             k = 0;
             for (int i = 0; i < numOfPartNeeded; i++) {
@@ -69,27 +77,35 @@ public class DataPartHandler {
                     for (int j = 0; j < Packet.NUM_OF_WORD_PER_PACKET; j++) xns[k++] = startId++;
                 }
             }
+            assert k == xns.length;
 
             GlobalErrorCorrecter gec = new GlobalErrorCorrecter();
             gec.init(xs, ys);
             long[] yns = gec.getValues(xns);
+//            try {
+//                FileWriter writer = new FileWriter("fuck.txt");
+//                for (int i = 0; i < xs.length; i++)
+//                    writer.write(xs[i] + " " + ys[i] + "\n");
+//                writer.close();
+//            } catch (Exception e) {}
 
             k = 0;
-            for (int i = 0; i < numOfPartNeeded && k < yns.length; i++) {
+            for (int i = 0; i < numOfPartNeeded; i++) {
                 if (data[i] == null) {
                     data[i] = DataHelper.symbolsToBytes(Arrays.copyOfRange(yns, k, k + Packet.NUM_OF_WORD_PER_PACKET));
                     k += Packet.NUM_OF_WORD_PER_PACKET;
                 }
             }
+            assert k == yns.length;
         }
 
         byte[] file = new byte[numOfBytes];
         for (int i = 0; i + 1 < numOfPartNeeded; i++) {
-//            assert data[i] != null;
+            assert data[i] != null;
             System.arraycopy(data[i], 0, file, i * Packet.PACKET_DATA_SIZE, Packet.PACKET_DATA_SIZE);
         }
         int remainder = numOfBytes % Packet.PACKET_DATA_SIZE;
-//        assert data[numOfPartNeeded - 1] != null;
+        assert data[numOfPartNeeded - 1] != null;
         System.arraycopy(data[numOfPartNeeded - 1], 0, file, numOfBytes - remainder, remainder);
 
         return file;

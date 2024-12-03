@@ -1,13 +1,14 @@
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Random;
 
 
 public class LocalErrorCorrecter {
 
     /*
-    * using extended Hamming code to detect and correct 1-bit error in packet
-    * https://en.wikipedia.org/wiki/Hamming_code
-    * */
+     * using extended Hamming code to detect and correct 1-bit error in packet
+     * https://en.wikipedia.org/wiki/Hamming_code
+     * */
 
     public static final int ECC_BIT = 14;
     public static final int DECODE_SIZE = (1 << (ECC_BIT - 1));
@@ -69,47 +70,36 @@ public class LocalErrorCorrecter {
 
     // UNIT TEST
 //    public static void main(String[] args) throws Exception {
-//////        byte[] arr = {1, 0, 2, 4, 5, 1, 99, 127, 27, -128, 0, 0};
-////        byte[] arr = new byte[1022];
-////        arr[1021] = 2;
-////        BitSet data = DataHelper.bytesToBitSet(arr);
-////        System.out.println(data.length());
-//////        System.out.println(data);
-////        try {
-////            data = encode(data);
-//////            System.out.println(data.get(DECODE_SIZE - 1));
-////            System.out.println(data.length());
-//////            System.out.println(data);
-//////            data.flip(12); // create error
-////            data.flip(84); // create error
-////            if (correct(data)) {
-//////                System.out.println("YES");
-////                data = decode(data);
-////                System.out.println(Arrays.toString(DataHelper.bitSetToBytes(data, arr.length)));
-////            } else {
-////                System.out.println("Can't correct!");
-////            }
-////        } catch (Exception e) {
-////            System.out.println(e.getMessage());
-////        }
-////        byte[] arr = {1, 4, 2, 0, 3, -1, 0, 0};
-////        byte[] arr = {-128, -128, -128, -128, -128, -128, 127, 127, 127, 0, 0};
-//        long start = (long)1e9;
-//        byte[] arr = DataHelper.longToBytes(start, 4);
-//        byte[] tmp1 = Arrays.copyOf(arr, LocalErrorCorrecter.ENCODE_BYTE_SIZE);
-//        BitSet bits = DataHelper.bytesToBitSet(tmp1);
-//        bits = encode(bits);
-//        byte[] tmp2 = DataHelper.bitSetToBytes(bits, LocalErrorCorrecter.DECODE_BYTE_SIZE);
 //
-//        BitSet tmp3 = DataHelper.bytesToBitSet(tmp2);
-//        tmp3.flip(10);
-//        correct(tmp3);
-//        BitSet tmp4 = decode(tmp3);
-////        System.out.println(Arrays.toString(DataHelper.bitSetToBytes(tmp4, LocalErrorCorrecter.ENCODE_BYTE_SIZE)));
-////        System.out.println(Arrays.toString(DataHelper.bitSetToBytes(tmp4, arr.length)));
-//        System.out.println(start);
-//        System.out.println(DataHelper.bytesToLong(arr, 0, 4));
-//        System.out.println(DataHelper.bytesToLong(DataHelper.bitSetToBytes(tmp4, arr.length), 0, 4));
+//        for (int j = 0; j < 500; j++) {
+//            Random rand = new Random();
+//            byte[] data = new byte[ENCODE_BYTE_SIZE];
+//            for (int i = 0; i < ENCODE_BYTE_SIZE; i++)
+//                data[i] = (byte) rand.nextInt(256);
+////            System.out.println(Arrays.toString(data));
+//
+//            BitSet tmp1 = DataHelper.bytesToBitSet(data);
+//            BitSet tmp2 = encode(tmp1);
+//
+//            // create error
+//            tmp2.flip(84);
+//
+//            if (!correct(tmp2)) {
+//                System.out.println("ERROR 1");
+//                return;
+//            }
+//
+//            BitSet tmp3 = decode(tmp2);
+//            byte[] tmp4 = DataHelper.bitSetToBytes(tmp3, ENCODE_BYTE_SIZE);
+//            for (int i = 0; i < ENCODE_BYTE_SIZE; i++) {
+//                if (data[i] != tmp4[i]) {
+//                    System.out.println("ERROR 2");
+//                    break;
+//                }
+//            }
+//
+////            System.out.println(Arrays.toString(tmp4));
+//        }
 //
 //    }
 
