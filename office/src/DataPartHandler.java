@@ -38,8 +38,6 @@ public class DataPartHandler {
             return;
         }
         data[partId] = partData;
-//        if (partId == 406)
-//            System.out.println(Arrays.toString(partData));
         numPartReceived.incrementAndGet();
     }
 
@@ -82,12 +80,6 @@ public class DataPartHandler {
             GlobalErrorCorrecter gec = new GlobalErrorCorrecter();
             gec.init(xs, ys);
             long[] yns = gec.getValues(xns);
-//            try {
-//                FileWriter writer = new FileWriter("fuck.txt");
-//                for (int i = 0; i < xs.length; i++)
-//                    writer.write(xs[i] + " " + ys[i] + "\n");
-//                writer.close();
-//            } catch (Exception e) {}
 
             k = 0;
             for (int i = 0; i < numOfPartNeeded; i++) {

@@ -2,7 +2,7 @@ public abstract class Packet {
 
     /*
      * packet structure(in byte):
-     * file_id(8) - unique id of file (in reality it will have some structure, for now it will be current millisecond)
+     * file_id(8) - unique id of file
      * num_of_bytes(4) - number of byte in file after compress
      * packet_id(4) - packet id (use to reconstruct the file)
      * packet_data(990) - packet data

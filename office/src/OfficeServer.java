@@ -19,25 +19,14 @@ public class OfficeServer implements Runnable {
 
     private static final boolean DEBUG = true;
 
-    private static final String FILE_PATH = Paths.get("").toAbsolutePath().toString() +
-            FileSystems.getDefault().getSeparator() + "received" + FileSystems.getDefault().getSeparator();
+    private final String FILE_PATH;
     private static final int FILE_TIMEOUT = 10 * 1000;
 
     private static final int OFFICE_PORT = 8888;
     private static final int SCADA_PORT = 6969;
-    private static final InetAddress OFFICE_ADDRESS = InetAddress.getLoopbackAddress(); // OFFICE_IP
-    private static final InetAddress SCADA_ADDRESS = InetAddress.getLoopbackAddress(); // SCADA_IP
-//    private static final InetAddress OFFICE_ADDRESS;
-//    private static final InetAddress SCADA_ADDRESS;
-//
-//    static {
-//        try {
-//            OFFICE_ADDRESS = InetAddress.getByName("10.10.27.199");
-//            SCADA_ADDRESS = InetAddress.getByName("10.10.26.207");
-//        } catch (UnknownHostException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    private final InetAddress OFFICE_ADDRESS; // OFFICE_IP
+    private final InetAddress SCADA_ADDRESS; // SCADA_IP
+
 
     private final DatagramSocket socket;
     private boolean running;
@@ -45,10 +34,21 @@ public class OfficeServer implements Runnable {
     private final ConcurrentHashMap<Long, ReadWriteLock> registerLocks;
     private final ConcurrentHashMap<Long, File> files;
 
-    private static final int STRONG_THREAD = Runtime.getRuntime().availableProcessors() * 2;
+    private static final int STRONG_THREAD = Runtime.getRuntime().availableProcessors() * 4;
     private final ExecutorService executorService;
 
     public OfficeServer() throws Exception {
+
+        if (DEBUG) {
+            OFFICE_ADDRESS = InetAddress.getLoopbackAddress();
+            SCADA_ADDRESS = InetAddress.getLoopbackAddress();
+        } else {
+            SCADA_ADDRESS = InetAddress.getByName("2.2.2.2");
+            OFFICE_ADDRESS = InetAddress.getByName("3.3.3.2");
+        }
+        FILE_PATH = Paths.get("").toAbsolutePath().toString() +
+                FileSystems.getDefault().getSeparator() + "received" + FileSystems.getDefault().getSeparator();
+
         executorService = Executors.newFixedThreadPool(STRONG_THREAD);
         socket = new DatagramSocket(OFFICE_PORT, OFFICE_ADDRESS);
         registerLocks = new ConcurrentHashMap<>();
@@ -253,14 +253,12 @@ public class OfficeServer implements Runnable {
 //                        System.out.println(Arrays.toString(partData));
 //                    }
                     // create packet loss
-                    if (partId == 0) return;
+//                    if (partId == 0) return;
                 }
 
                 file.addPart(partId, partData);
                 if (file.getState() == File.STATE_RECEIVE_ENOUGH && file.saveFile(FILE_PATH)) {
-                    if (DEBUG) {
-                        System.out.println("File receive enough, saved!");
-                    }
+                    System.out.println("File receive enough, saving to " + FILE_PATH);
                 }
 
             } catch (Exception e) {

@@ -1,17 +1,55 @@
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) throws Exception {
         ScadaServer server = new ScadaServer();
         new Thread(server).start();
 
-        // test
-//        server.sendFile("C:\\Users\\nguye\\Downloads\\Slides-20240929T162825Z-001\\Slides\\Chapter5_DISCRETE FOURIER TRANSFORM.pdf");
-//        server.sendFile("D:\\PBL6\\office\\received\\firefox.exe");
-        server.sendFile("D:\\PBL6\\scada\\src\\GlobalErrorCorrecter.java");
-//        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/scada/src/GlobalErrorCorrecter.java");
-//        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/office/received/rs_nasa.pdf");
-//        server.sendFile("D:\\PBL6\\office\\received\\dft.pdf");
-//        server.sendFile("D:\\PBL6\\office\\received\\justine.pdf");
-//        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/office/received/NovelPolynomialBasisFFT2016.pdf");
-//        server.sendFile("/home/uy/PBL6/PBL6_DUT_ODP/office/received/justine.pdf");
+        // console app..
+        System.out.println("-f {file path} -n {num of file} or -q to quit.");
+        Scanner scanner = new Scanner(System.in);
+        String input;
+        while (true) {
+
+            input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase("-q")) {
+                System.out.println("Exiting program. Goodbye!");
+                break;
+            }
+
+            if (input.startsWith("-f") && input.contains("-n")) {
+                try {
+                    String[] parts = input.split(" ");
+
+                    String filePath = null;
+                    int numOfFile = 0;
+
+                    for (int i = 0; i < parts.length; i++) {
+                        if (parts[i].equals("-f") && i + 1 < parts.length) {
+                            filePath = parts[i + 1];
+                        } else if (parts[i].equals("-n") && i + 1 < parts.length) {
+                            numOfFile = Integer.parseInt(parts[i + 1]);
+                        }
+                    }
+
+                    if (filePath != null && numOfFile > 0) {
+
+                        for (int i = 0; i < numOfFile; i++)
+                            server.sendFile(filePath);
+
+                    } else {
+                        System.out.println("Invalid command. Please use the format: -f {file path} -n {num of file}");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid number format for {num_of_file}. Please enter a valid integer.");
+                }
+            } else {
+                System.out.println("Invalid command. Please use the format: -f {file_path} -n {num_of_file} or -q to quit.");
+            }
+
+        }
+
+        server.stopServer();
+
     }
 }

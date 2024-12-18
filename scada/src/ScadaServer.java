@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,34 +16,33 @@ public class ScadaServer implements Runnable {
 
     // TODO: may replace concurrent data structure by database later..
 
-    private static final boolean DEBUG = true;
+    private final boolean DEBUG = true;
     private static final int FILE_NAME_SIZE = 69; // Allow only 68 bytes, last byte use to determine length
+    private static final int MAX_FILE_SIZE = 1 << 14; // TODO: improve later..
+    private final Random rand;
 
-    private static final int OFFICE_PORT = 8888;
-    private static final int SCADA_PORT = 6969;
-    private static final InetAddress OFFICE_ADDRESS = InetAddress.getLoopbackAddress(); // OFFICE_IP
-    private static final InetAddress SCADA_ADDRESS = InetAddress.getLoopbackAddress(); // SCADA_IP
-//    private static final InetAddress OFFICE_ADDRESS;
-//    private static final InetAddress SCADA_ADDRESS;
-//
-//    static {
-//        try {
-//            SCADA_ADDRESS = InetAddress.getByName("10.10.27.199");
-//            OFFICE_ADDRESS = InetAddress.getByName("10.10.26.207");
-//        } catch (UnknownHostException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    private final static int OFFICE_PORT = 8888;
+    private final static int SCADA_PORT = 6969;
+    private final InetAddress OFFICE_ADDRESS; // OFFICE_IP
+    private final InetAddress SCADA_ADDRESS; // SCADA_IP
 
     private final DatagramSocket socket;
     private boolean running;
 
     private final ConcurrentLinkedQueue<String> dataQueue;
 
-    private static final int STRONG_THREAD = Runtime.getRuntime().availableProcessors() * 2;
+    private static final int STRONG_THREAD = Runtime.getRuntime().availableProcessors() * 4;
     private final ExecutorService executorService;
 
     public ScadaServer() throws Exception {
+        rand = new Random();
+        if (DEBUG) {
+            OFFICE_ADDRESS = InetAddress.getLoopbackAddress();
+            SCADA_ADDRESS = InetAddress.getLoopbackAddress();
+        } else {
+            SCADA_ADDRESS = InetAddress.getByName("2.2.2.2");
+            OFFICE_ADDRESS = InetAddress.getByName("3.3.3.2");
+        }
         executorService = Executors.newFixedThreadPool(STRONG_THREAD);
         dataQueue = new ConcurrentLinkedQueue<>();
         socket = new DatagramSocket(SCADA_PORT, SCADA_ADDRESS);
@@ -77,12 +77,13 @@ public class ScadaServer implements Runnable {
 
             try {
 
-                long currentTime = System.currentTimeMillis();
+                long currentTime = System.currentTimeMillis(), id = Math.abs(rand.nextLong());
+                byte[] file_id = DataHelper.longToBytes(id, Packet.FILE_ID_SIZE);
                 if (DEBUG) {
-                    System.out.println("File id: " + currentTime);
+                    System.out.println("File id: " + id);
                 }
 
-                byte[] file_name = DataHelper.stringToBytes(currentTime + "_" + DataHelper.getFileName(filePath));
+                byte[] file_name = DataHelper.stringToBytes(currentTime + "_" + id + "_" + DataHelper.getFileName(filePath));
                 if (file_name.length + 1 > FILE_NAME_SIZE) throw new Exception("File name too long!");
 
                 byte[] file_data = DataHelper.readFileBytes(filePath);
@@ -100,12 +101,14 @@ public class ScadaServer implements Runnable {
 
                 data = Compresser.compress(data);
 
+                if (data.length > MAX_FILE_SIZE) throw new Exception("File too large!");
+                if (data.length < Packet.PACKET_DATA_SIZE) System.out.println("File too small, may fail to receive!");
+
                 if (DEBUG) {
                     System.out.println("Sending file: " + filePath);
                     System.out.println("File size(after compression): " + data.length);
                 }
 
-                byte[] file_id = DataHelper.longToBytes(currentTime, Packet.FILE_ID_SIZE);
                 byte[] num_of_bytes = DataHelper.longToBytes(data.length, Packet.NUM_OF_BYTES_SIZE);
 
                 data = DataHelper.addPaddingWord(data);
@@ -124,23 +127,6 @@ public class ScadaServer implements Runnable {
                 ys = DataHelper.concatLongs(ys, yrs);
 
                 data = DataHelper.symbolsToBytes(ys);
-
-//                int fuck_len = xs.length;
-//                xs = DataHelper.concatLongs(xs, xrs);
-//                GlobalErrorCorrecter gec2 = new GlobalErrorCorrecter();
-//                long[] f1 = Arrays.copyOfRange(xs, 330, fuck_len + 330);
-//                long[] f2 = Arrays.copyOfRange(ys, 330, fuck_len + 330);
-//                gec2.init(f1, f2);
-//                long[] fuck = gec2.getValues(xs);
-//                for (int i = 0; i < ys.length; i++) {
-//                    if (ys[i] != fuck[i]) {
-//                        System.out.println("Error");
-//                    }
-//                }
-//                FileWriter writer = new FileWriter("fuck.txt");
-//                for (int i = 0; i < f1.length; i++)
-//                    writer.write(f1[i] + " " + f2[i] + "\n");
-//                writer.close();
 
                 if (DEBUG) {
                     System.out.println("File size(after add redundant): " + data.length);
@@ -161,17 +147,13 @@ public class ScadaServer implements Runnable {
                     byte[] buffer = DataHelper.bitSetToBytes(LocalErrorCorrecter.encode(DataHelper.bytesToBitSet(buf)), LocalErrorCorrecter.DECODE_BYTE_SIZE);
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, OFFICE_ADDRESS, OFFICE_PORT);
                     socket.send(packet);
-//                    if (i / Packet.PACKET_DATA_SIZE == 406) {
-//                        byte[] fuck = Arrays.copyOfRange(buf, Packet.PACKET_DATA_START, Packet.PACKET_DATA_END);
-//                        System.out.println(Arrays.toString(fuck));
-//                    }
                 }
 
                 if (DEBUG) {
                     System.out.println("Number of parts: " + data.length / Packet.PACKET_DATA_SIZE);
-                    System.out.println("Send completed!");
                 }
 
+                System.out.println(filePath + " send completed!");
 
             } catch (Exception e) {
                 // TODO: try retry later..

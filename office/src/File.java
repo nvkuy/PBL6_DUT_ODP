@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,8 +43,9 @@ public class File {
         while (tmp[last] == tmp[last + 1]) last--;
 
         String fileName = System.currentTimeMillis() + "_" + DataHelper.bytesToString(Arrays.copyOfRange(tmp, 0, last + 1));
-        DataHelper.writeFileBytes(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length));
-        data = null; // allow gc clear data
+//        DataHelper.writeFileBytes(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length));
+        Thread.startVirtualThread(new FileSaver(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length)));
+//        data = null; // allow gc clear data
         state.set(STATE_RECEIVE_SUCCESS);
         return true;
     }
@@ -54,6 +56,31 @@ public class File {
             return -1;
         }
         return version.get();
+    }
+
+    private class FileSaver implements Runnable {
+
+        /*
+         * light-weight, short-live thread to save file
+         */
+
+        private String filePath;
+        private byte[] file;
+
+        public FileSaver(String filePath, byte[] file) {
+            this.filePath = filePath;
+            this.file = file;
+        }
+
+        @Override
+        public void run() {
+            try {
+                DataHelper.writeFileBytes(filePath, file);
+            } catch (IOException e) {
+                System.out.println("Error saving file " + filePath);
+//                e.printStackTrace();
+            }
+        }
     }
 
 }
