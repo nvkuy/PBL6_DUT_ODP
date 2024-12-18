@@ -1,0 +1,5 @@
+gcc -o checker checker.c md5.c
+
+./checker -f <file_path>
+
+./checker -d <directory_path> -h <md5_hash>

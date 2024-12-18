@@ -17,7 +17,7 @@ public class OfficeServer implements Runnable {
 
     // TODO: may replace concurrent data structure by database later..
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private final String FILE_PATH;
     private static final int FILE_TIMEOUT = 10 * 1000;
@@ -57,21 +57,15 @@ public class OfficeServer implements Runnable {
 
         Files.createDirectories(Paths.get(FILE_PATH));
 
-        if (DEBUG) {
-            System.out.println("OfficeServer started!");
-            System.out.println("Save file at: " + FILE_PATH);
-        }
+        System.out.println("OfficeServer started!");
+        System.out.println("Save file at: " + FILE_PATH);
 
     }
 
     public void stopServer() {
         running = false;
         socket.close();
-
-        if (DEBUG) {
-            System.out.println("OfficeServer stopped!");
-        }
-
+        System.out.println("OfficeServer stopped!");
     }
 
     @Override
@@ -133,9 +127,7 @@ public class OfficeServer implements Runnable {
                     file = files.get(fileId);
                     init = true;
 
-                    if (DEBUG) {
-                        System.out.println("File " + fileId + " registered!");
-                    }
+                    System.out.println("File " + fileId + " registered!");
 
                 }
                 initLock.writeLock().unlock();
@@ -178,9 +170,7 @@ public class OfficeServer implements Runnable {
                 if (file.getState() != File.STATE_RECEIVING) break;
                 version = file.deleteIfSame(version);
                 if (version < 0) {
-                    if (DEBUG) {
-                        System.out.println("File timeout, deleted!");
-                    }
+                    System.out.println("File timeout, deleted!");
                     break;
                 }
             }

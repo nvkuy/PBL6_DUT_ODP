@@ -16,7 +16,7 @@ public class ScadaServer implements Runnable {
 
     // TODO: may replace concurrent data structure by database later..
 
-    private final boolean DEBUG = true;
+    private final boolean DEBUG = false;
     private static final int FILE_NAME_SIZE = 69; // Allow only 68 bytes, last byte use to determine length
     private static final int MAX_FILE_SIZE = 1 << 14; // TODO: improve later..
     private final Random rand;
@@ -79,9 +79,7 @@ public class ScadaServer implements Runnable {
 
                 long currentTime = System.currentTimeMillis(), id = Math.abs(rand.nextLong());
                 byte[] file_id = DataHelper.longToBytes(id, Packet.FILE_ID_SIZE);
-                if (DEBUG) {
-                    System.out.println("File id: " + id);
-                }
+                System.out.println("File id: " + id + " | " + filePath);
 
                 byte[] file_name = DataHelper.stringToBytes(currentTime + "_" + id + "_" + DataHelper.getFileName(filePath));
                 if (file_name.length + 1 > FILE_NAME_SIZE) throw new Exception("File name too long!");
@@ -153,7 +151,7 @@ public class ScadaServer implements Runnable {
                     System.out.println("Number of parts: " + data.length / Packet.PACKET_DATA_SIZE);
                 }
 
-                System.out.println(filePath + " send completed!");
+                System.out.println("File " + id + " send completed!");
 
             } catch (Exception e) {
                 // TODO: try retry later..
