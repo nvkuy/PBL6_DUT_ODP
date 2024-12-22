@@ -1,16 +1,12 @@
-import java.io.FileWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.lang.Math.ceilDiv;
-import static java.lang.Math.min;
 
 public class ScadaServer implements Runnable {
 
@@ -18,7 +14,7 @@ public class ScadaServer implements Runnable {
 
     private final boolean DEBUG = false;
     private static final int FILE_NAME_SIZE = 69; // Allow only 68 bytes, last byte use to determine length
-    private static final int MAX_FILE_SIZE = 1 << 14; // TODO: improve later..
+    private static final int MAX_FILE_BYTE_SIZE = 1 << 15; // TODO: improve later..
     private final Random rand;
 
     private final static int OFFICE_PORT = 8888;
@@ -99,7 +95,7 @@ public class ScadaServer implements Runnable {
 
                 data = Compresser.compress(data);
 
-                if (data.length > MAX_FILE_SIZE) throw new Exception("File too large!");
+                if (data.length > MAX_FILE_BYTE_SIZE) throw new Exception("File too large!");
                 if (data.length < Packet.PACKET_DATA_SIZE) System.out.println("File too small, may fail to receive!");
 
                 if (DEBUG) {

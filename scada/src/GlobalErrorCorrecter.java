@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.Random;
 
 public class GlobalErrorCorrecter {
 
@@ -15,9 +14,9 @@ public class GlobalErrorCorrecter {
 
     private static final long MOD = Const.MOD65537;
     private static final ModArithmetic MA = ModArithmetic65537.INSTANCE;
-    private Convolution cnv;
-    private ModPolynomialFactory mpf;
-    private ModArithmetic ma;
+    private final Convolution cnv;
+    private final ModPolynomialFactory mpf;
+    private final ModArithmetic ma;
     private ModPolynomialFactory.ModPolynomial f;
 
     public GlobalErrorCorrecter() {
@@ -700,10 +699,10 @@ final class ModPolynomialFactory {
 
 
 interface ArithmeticOperations<T> {
-    public T add(T t);
-    public T sub(T t);
-    public T mul(T t);
-    public T div(T t);
+    T add(T t);
+    T sub(T t);
+    T mul(T t);
+    T div(T t);
 }
 
 class Const {
@@ -758,63 +757,63 @@ abstract class Convolution {
  * @author https://atcoder.jp/users/suisen
  */
 interface ModArithmetic {
-    public long getMod();
-    public long mod(long a);
-    public long add(long a, long b);
-    public long sub(long a, long b);
-    public long mul(long a, long b);
-    public long inv(long a);
-    public long pow(long a, long b);
-    public default long add(long a, long b, long c) {
+    long getMod();
+    long mod(long a);
+    long add(long a, long b);
+    long sub(long a, long b);
+    long mul(long a, long b);
+    long inv(long a);
+    long pow(long a, long b);
+    default long add(long a, long b, long c) {
         return add(a, add(b, c));
     }
-    public default long add(long a, long b, long c, long d) {
+    default long add(long a, long b, long c, long d) {
         return add(a, add(b, add(c, d)));
     }
-    public default long add(long a, long b, long c, long d, long e) {
+    default long add(long a, long b, long c, long d, long e) {
         return add(a, add(b, add(c, add(d, e))));
     }
-    public default long add(long a, long b, long c, long d, long e, long f) {
+    default long add(long a, long b, long c, long d, long e, long f) {
         return add(a, add(b, add(c, add(d, add(e, f)))));
     }
-    public default long add(long a, long b, long c, long d, long e, long f, long g) {
+    default long add(long a, long b, long c, long d, long e, long f, long g) {
         return add(a, add(b, add(c, add(d, add(e, add(f, g))))));
     }
-    public default long add(long a, long b, long c, long d, long e, long f, long g, long h) {
+    default long add(long a, long b, long c, long d, long e, long f, long g, long h) {
         return add(a, add(b, add(c, add(d, add(e, add(f, add(g, h)))))));
     }
-    public default long add(long... xs) {
+    default long add(long... xs) {
         long s = 0;
         for (long x : xs) s += x;
         return mod(s);
     }
-    public default long mul(long a, long b, long c) {
+    default long mul(long a, long b, long c) {
         return mul(a, mul(b, c));
     }
-    public default long mul(long a, long b, long c, long d) {
+    default long mul(long a, long b, long c, long d) {
         return mul(a, mul(b, mul(c, d)));
     }
-    public default long mul(long a, long b, long c, long d, long e) {
+    default long mul(long a, long b, long c, long d, long e) {
         return mul(a, mul(b, mul(c, mul(d, e))));
     }
-    public default long mul(long a, long b, long c, long d, long e, long f) {
+    default long mul(long a, long b, long c, long d, long e, long f) {
         return mul(a, mul(b, mul(c, mul(d, mul(e, f)))));
     }
-    public default long mul(long a, long b, long c, long d, long e, long f, long g) {
+    default long mul(long a, long b, long c, long d, long e, long f, long g) {
         return mul(a, mul(b, mul(c, mul(d, mul(e, mul(f, g))))));
     }
-    public default long mul(long a, long b, long c, long d, long e, long f, long g, long h) {
+    default long mul(long a, long b, long c, long d, long e, long f, long g, long h) {
         return mul(a, mul(b, mul(c, mul(d, mul(e, mul(f, mul(g, h)))))));
     }
-    public default long mul(long... xs) {
+    default long mul(long... xs) {
         long s = 1;
         for (long x : xs) s = mul(s, x);
         return s;
     }
-    public default long div(long a, long b) {
+    default long div(long a, long b) {
         return mul(a, inv(b));
     }
-    public default java.util.OptionalLong sqrt(long a) {
+    default java.util.OptionalLong sqrt(long a) {
         a = mod(a);
         if (a == 0) return java.util.OptionalLong.of(0);
         if (a == 1) return java.util.OptionalLong.of(1);
@@ -860,7 +859,7 @@ interface ModArithmetic {
 
     /** array operations */
 
-    public default long[] rangeInv(int n) {
+    default long[] rangeInv(int n) {
         final long MOD = getMod();
         if (n >= MOD) throw new ArithmeticException("divide by zero");
         long[] invs = new long[n + 1];
@@ -873,7 +872,7 @@ interface ModArithmetic {
         }
         return invs;
     }
-    public default long[] arrayInv(long[] a) {
+    default long[] arrayInv(long[] a) {
         int n = a.length;
         long[] dp = new long[n + 1];
         long[] pd = new long[n + 1];
@@ -888,13 +887,13 @@ interface ModArithmetic {
         }
         return invs;
     }
-    public default long[] factorial(int n) {
+    default long[] factorial(int n) {
         long[] ret = new long[n + 1];
         ret[0] = 1;
         for (int i = 1; i <= n; i++) ret[i] = mul(ret[i - 1], i);
         return ret;
     }
-    public default long[] factorialInv(int n) {
+    default long[] factorialInv(int n) {
         long facN = 1;
         for (int i = 2; i <= n; i++) facN = mul(facN, i);
         long[] invs = new long[n + 1];
@@ -902,7 +901,7 @@ interface ModArithmetic {
         for (int i = n; i > 0; i--) invs[i - 1] = mul(invs[i], i);
         return invs;
     }
-    public default long[] rangePower(long a, int n) {
+    default long[] rangePower(long a, int n) {
         a = mod(a);
         long[] pows = new long[n + 1];
         pows[0] = 1;
@@ -912,7 +911,7 @@ interface ModArithmetic {
 
     /** combinatric operations */
 
-    public default long[][] combTable(int n) {
+    default long[][] combTable(int n) {
         long[][] comb = new long[n + 1][];
         for (int i = 0; i <= n; i++) {
             comb[i] = new long[i + 1];
@@ -923,12 +922,12 @@ interface ModArithmetic {
         }
         return comb;
     }
-    public default long comb(int n, int r, long[] factorial, long[] invFactorial) {
+    default long comb(int n, int r, long[] factorial, long[] invFactorial) {
         if (r < 0 || r > n) return 0;
         long inv = mul(invFactorial[r], invFactorial[n - r]);
         return mul(factorial[n], inv);
     }
-    public default long naiveComb(long n, long r) {
+    default long naiveComb(long n, long r) {
         if (r < 0 || r > n) return 0;
         r = Math.min(r, n - r);
         if (r == 0) return 1;
@@ -939,11 +938,11 @@ interface ModArithmetic {
         }
         return res;
     }
-    public default long perm(int n, int r, long[] factorial, long[] invFactorial) {
+    default long perm(int n, int r, long[] factorial, long[] invFactorial) {
         if (r < 0 || r > n) return 0;
         return mul(factorial[n], invFactorial[n - r]);
     }
-    public default long naivePerm(long n, long r) {
+    default long naivePerm(long n, long r) {
         if (r < 0 || r > n) return 0;
         long res = 1;
         for (long i = n - r + 1; i <= n; i++) res = mul(res, i);

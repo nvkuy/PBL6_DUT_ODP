@@ -64,8 +64,8 @@ public class File {
          * light-weight, short-live thread to save file
          */
 
-        private String filePath;
-        private byte[] file;
+        private final String filePath;
+        private final byte[] file;
 
         public FileSaver(String filePath, byte[] file) {
             this.filePath = filePath;

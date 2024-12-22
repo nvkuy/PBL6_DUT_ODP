@@ -1,7 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -46,7 +45,7 @@ public class OfficeServer implements Runnable {
             SCADA_ADDRESS = InetAddress.getByName("2.2.2.2");
             OFFICE_ADDRESS = InetAddress.getByName("3.3.3.2");
         }
-        FILE_PATH = Paths.get("").toAbsolutePath().toString() +
+        FILE_PATH = Paths.get("").toAbsolutePath() +
                 FileSystems.getDefault().getSeparator() + "received" + FileSystems.getDefault().getSeparator();
 
         executorService = Executors.newFixedThreadPool(STRONG_THREAD);
