@@ -1,0 +1,2 @@
+sender: cat {send_file_path} | nc -u -q 1 3.3.3.2 12345
+receiver: nc -u -p $PORT -l -w 10 > {receive_file_path}

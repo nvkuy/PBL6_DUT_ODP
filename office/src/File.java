@@ -45,7 +45,7 @@ public class File {
         String fileName = System.currentTimeMillis() + "_" + DataHelper.bytesToString(Arrays.copyOfRange(tmp, 0, last + 1));
 //        DataHelper.writeFileBytes(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length));
         Thread.startVirtualThread(new FileSaver(path + fileName, Arrays.copyOfRange(rawFile, FILE_NAME_SIZE, rawFile.length)));
-//        data = null; // allow gc clear data
+        data = null; // allow gc clear data
         state.set(STATE_RECEIVE_SUCCESS);
         return true;
     }

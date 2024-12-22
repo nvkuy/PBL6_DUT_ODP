@@ -31,8 +31,8 @@
                 "locked": false,
                 "rotation": 0,
                 "svg": "<svg width=\"99\" height=\"29\"><text font-family=\"TypeWriter\" font-size=\"10.0\" font-weight=\"bold\" fill=\"#000000\" fill-opacity=\"1.0\">2.2.2.0/24</text></svg>",
-                "x": -454,
-                "y": -100,
+                "x": -456,
+                "y": -87,
                 "z": 2
             },
             {
@@ -40,8 +40,8 @@
                 "locked": false,
                 "rotation": 0,
                 "svg": "<svg width=\"99\" height=\"29\"><text font-family=\"TypeWriter\" font-size=\"10.0\" font-weight=\"bold\" fill=\"#000000\" fill-opacity=\"1.0\">3.3.3.0/24</text></svg>",
-                "x": 284,
-                "y": -113,
+                "x": 295,
+                "y": -79,
                 "z": 2
             },
             {
@@ -58,8 +58,8 @@
                 "locked": false,
                 "rotation": 0,
                 "svg": "<svg width=\"24\" height=\"29\"><text font-family=\"TypeWriter\" font-size=\"10.0\" font-weight=\"bold\" fill=\"#000000\" fill-opacity=\"1.0\">.1</text></svg>",
-                "x": 252,
-                "y": -158,
+                "x": 246,
+                "y": -135,
                 "z": 2
             },
             {
@@ -85,8 +85,8 @@
                 "locked": false,
                 "rotation": 0,
                 "svg": "<svg width=\"24\" height=\"29\"><text font-family=\"TypeWriter\" font-size=\"10.0\" font-weight=\"bold\" fill=\"#000000\" fill-opacity=\"1.0\">.2</text></svg>",
-                "x": -420,
-                "y": -44,
+                "x": -410,
+                "y": -21,
                 "z": 2
             },
             {
@@ -94,8 +94,8 @@
                 "locked": false,
                 "rotation": 0,
                 "svg": "<svg width=\"24\" height=\"29\"><text font-family=\"TypeWriter\" font-size=\"10.0\" font-weight=\"bold\" fill=\"#000000\" fill-opacity=\"1.0\">.2</text></svg>",
-                "x": 353,
-                "y": -61,
+                "x": 360,
+                "y": -21,
                 "z": 2
             }
         ],
@@ -105,12 +105,8 @@
                     "corrupt": [
                         2
                     ],
-                    "delay": [
-                        25,
-                        0
-                    ],
                     "packet_loss": [
-                        8
+                        7
                     ]
                 },
                 "link_id": "286c2d0a-7758-4af9-b565-1bff5c2af503",
@@ -145,7 +141,7 @@
             },
             {
                 "filters": {},
-                "link_id": "f3b3e9fa-055d-4b1d-b6ee-a851ca94e299",
+                "link_id": "fed7038e-d4bc-43f5-a1a3-2cf51a35fd0c",
                 "link_style": {},
                 "nodes": [
                     {
@@ -154,8 +150,8 @@
                             "rotation": 0,
                             "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
                             "text": "f0/1",
-                            "x": 32,
-                            "y": 61
+                            "x": 22,
+                            "y": 56
                         },
                         "node_id": "0b95ba3d-230b-4058-98a2-606b4c56bdbf",
                         "port_number": 1
@@ -166,10 +162,10 @@
                             "rotation": 0,
                             "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
                             "text": "e0",
-                            "x": 71,
+                            "x": 53,
                             "y": -4
                         },
-                        "node_id": "f5288720-c4d7-4663-842a-cadc9a1c19ec",
+                        "node_id": "0d56cc34-ba08-46aa-8374-55aec8f9ce09",
                         "port_number": 0
                     }
                 ],
@@ -177,7 +173,7 @@
             },
             {
                 "filters": {},
-                "link_id": "292490b1-d010-4814-9cb3-29261ab9befc",
+                "link_id": "3beacc59-3231-42d3-8320-369b8bf76370",
                 "link_style": {},
                 "nodes": [
                     {
@@ -186,8 +182,8 @@
                             "rotation": 0,
                             "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
                             "text": "f0/1",
-                            "x": 32,
-                            "y": 61
+                            "x": 20,
+                            "y": 64
                         },
                         "node_id": "31a664be-9f84-4d97-a968-cffc3db67d94",
                         "port_number": 1
@@ -198,10 +194,10 @@
                             "rotation": 0,
                             "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
                             "text": "e0",
-                            "x": -28,
-                            "y": 9
+                            "x": -33,
+                            "y": -1
                         },
-                        "node_id": "a2a5ebd0-19dc-4a75-aadf-141d7c71ef51",
+                        "node_id": "33500214-e765-429c-8bc3-5c15acbcae27",
                         "port_number": 0
                     }
                 ],
@@ -243,7 +239,7 @@
                     "idlesleep": 30,
                     "image": "c3725-adventerprisek9-mz124-15.image",
                     "image_md5sum": "1c950444f3261338c3d42e72a6ded980",
-                    "iomem": 5,
+                    "iomem": 10,
                     "mac_addr": "c201.2224.0000",
                     "mmap": true,
                     "nvram": 256,
@@ -300,7 +296,7 @@
                     "idlesleep": 30,
                     "image": "c3725-adventerprisek9-mz124-15.image",
                     "image_md5sum": "1c950444f3261338c3d42e72a6ded980",
-                    "iomem": 5,
+                    "iomem": 10,
                     "mac_addr": "c202.501c.0000",
                     "mmap": true,
                     "nvram": 256,
@@ -335,12 +331,12 @@
                     "rotation": 0,
                     "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
                     "text": "scada",
-                    "x": 3,
-                    "y": 63
+                    "x": 6,
+                    "y": 64
                 },
                 "locked": false,
                 "name": "scada",
-                "node_id": "f5288720-c4d7-4663-842a-cadc9a1c19ec",
+                "node_id": "0d56cc34-ba08-46aa-8374-55aec8f9ce09",
                 "node_type": "vmware",
                 "port_name_format": "Ethernet{0}",
                 "port_segment_size": 0,
@@ -352,13 +348,13 @@
                     "on_close": "power_off",
                     "usage": "",
                     "use_any_adapter": true,
-                    "vmx_path": "D:\\PBL6\\test\\vm\\scada\\scada.vmx"
+                    "vmx_path": "D:\\PBL6\\test\\vm\\scada\\server.vmx"
                 },
                 "symbol": ":/symbols/vmware_guest.svg",
-                "template_id": "290ab05b-08c6-4b74-861c-ba260990e712",
+                "template_id": "0a17ea32-c0f5-4ef0-b5d7-bc5228effe30",
                 "width": 65,
-                "x": -448,
-                "y": -9,
+                "x": -440,
+                "y": 16,
                 "z": 1
             },
             {
@@ -373,12 +369,12 @@
                     "rotation": 0,
                     "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
                     "text": "office",
-                    "x": 9,
-                    "y": 68
+                    "x": 4,
+                    "y": 64
                 },
                 "locked": false,
                 "name": "office",
-                "node_id": "a2a5ebd0-19dc-4a75-aadf-141d7c71ef51",
+                "node_id": "33500214-e765-429c-8bc3-5c15acbcae27",
                 "node_type": "vmware",
                 "port_name_format": "Ethernet{0}",
                 "port_segment_size": 0,
@@ -390,13 +386,13 @@
                     "on_close": "power_off",
                     "usage": "",
                     "use_any_adapter": true,
-                    "vmx_path": "D:\\PBL6\\test\\vm\\office\\office.vmx"
+                    "vmx_path": "D:\\PBL6\\test\\vm\\office\\Clone of server.vmx"
                 },
                 "symbol": ":/symbols/vmware_guest.svg",
-                "template_id": "e28ce294-426e-40a5-b2fa-3284a0db987b",
+                "template_id": "ec40591a-229b-4279-b67e-2c2f50237495",
                 "width": 65,
-                "x": 345,
-                "y": -29,
+                "x": 342,
+                "y": 16,
                 "z": 1
             }
         ]
