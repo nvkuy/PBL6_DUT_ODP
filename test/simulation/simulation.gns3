@@ -103,10 +103,10 @@
             {
                 "filters": {
                     "corrupt": [
-                        2
+                        1
                     ],
                     "packet_loss": [
-                        7
+                        5
                     ]
                 },
                 "link_id": "286c2d0a-7758-4af9-b565-1bff5c2af503",
