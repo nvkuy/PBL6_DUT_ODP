@@ -32,7 +32,7 @@ Our protocol ensures reliability through a combination of Error Correcting Codes
 
 More details (Vietnamese slide): [https://docs.google.com/presentation/d/1hx6VD0BnZ56sxZWkHDUv7O3jkKbw9FzKraP-6YrnELk/edit?usp=sharing](https://docs.google.com/presentation/d/1hx6VD0BnZ56sxZWkHDUv7O3jkKbw9FzKraP-6YrnELk/edit?usp=sharing)
 
-## Future Improvements (If Time Permits)
+## Will do if have time
 
 * Implement a faster Reed-Solomon algorithm: O(NlogN) complexity.
 * Remove the message size limit.
